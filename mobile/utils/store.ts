@@ -575,7 +575,7 @@ const userAuthStore = create<UserAuthState>((set, get) => ({
     try {
       const token = get().token || (await AsyncStorage.getItem("token"));
       const res = await fetch(`${URL}api/today-revenue`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${token} ` },
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.message);

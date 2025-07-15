@@ -32,7 +32,7 @@ const VALID_IONICONS = new Set([
 const SafeIonicon = ({ name, size = 22, color = "#000" }) => {
   const isValid = VALID_IONICONS.has(name);
   if (!isValid) {
-    console.warn(` Invalid Ionicon: ${name}`);
+    console.warn(`Invalid Ionicon: ${name}`);
   }
   return (
     <Ionicons
@@ -147,6 +147,14 @@ const VehicleScreen = () => {
     vehicleList,
   } = userAuthStore((state) => state);
 
+  useEffect(() => {
+    console.log(
+      `VehicleScreen rendered at ${new Date().toISOString()} with staffId: ${
+        staffId || "undefined"
+      }`
+    );
+  }, [staffId]);
+
   const handleList = async (type: string) => {
     if (checkType === "checkins") {
       await fetchCheckins(type, staffId as string);
@@ -198,22 +206,20 @@ const VehicleScreen = () => {
           data={filteredData}
           keyExtractor={(item) => item._id}
           renderItem={({ item }) => <CheckinCard item={item} />}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={{ paddingBottom: 30 }}
           ListHeaderComponent={
             <View className="px-4 py-4 gap-3">
-              {/* 🔍 Search */}
-              <View className="bg-white flex-row px-2 items-center rounded-sm">
-                <Ionicons name="search-outline" size={24} />
+              {/* Search */}
+              <View className="bg-white flex-row px-2 items-center rounded-sm border border-gray-200 h-12">
+                <Ionicons name="search-outline" size={24} color="#000" />
                 <TextInput
                   placeholder="Search vehicle"
                   value={search}
                   onChangeText={setSearch}
-                  className="rounded text-base flex-1 px-3 h-12 bg-white"
+                  className="flex-1 px-3 text-base bg-white"
                 />
               </View>
 
-              {/* 🚗 Vehicle Filter */}
+              {/* Vehicle Filter */}
               <View className="bg-white justify-center items-center w-full shadow-sm rounded-sm p-2">
                 <View className="justify-center items-center mb-2">
                   <Text className="text-2xl font-semibold">Vehicles</Text>
@@ -253,12 +259,13 @@ const VehicleScreen = () => {
                 />
               </View>
 
-              {/* 🧾 Filter Row */}
+              {/* Filter Row */}
               <View className="flex-row items-center gap-2">
-                <View className="flex-1">
+                <View className="flex-1 h-12 rounded-sm border border-gray-200 bg-white">
                   <Picker
                     selectedValue={checkType}
                     onValueChange={(val) => setCheckType(val)}
+                    style={{ height: 48, backgroundColor: "transparent" }}
                   >
                     <Picker.Item label="Check In" value="checkins" />
                     <Picker.Item label="Check Out" value="checkouts" />
@@ -267,7 +274,7 @@ const VehicleScreen = () => {
                 </View>
                 <TouchableOpacity
                   onPress={() => setShowDatePicker(true)}
-                  className="bg-blue-100 px-3 py-2 rounded shadow-sm"
+                  className="bg-blue-100 px-3 py-2 rounded-sm border border-gray-200 h-12 items-center justify-center"
                 >
                   <Text className="text-sm text-blue-800">
                     {filterDate
@@ -277,7 +284,6 @@ const VehicleScreen = () => {
                 </TouchableOpacity>
               </View>
 
-              {/* 📅 Date Picker */}
               {showDatePicker && (
                 <DateTimePicker
                   value={filterDate || new Date()}
@@ -293,8 +299,10 @@ const VehicleScreen = () => {
               )}
             </View>
           }
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 30 }}
           ListEmptyComponent={
-            <View className="flex-1 justify-center items-center mt-10">
+            <View className="justify-center items-center mt-10">
               <Text className="text-gray-500 text-base">
                 No vehicle data found
               </Text>

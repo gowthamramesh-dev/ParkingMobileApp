@@ -139,7 +139,7 @@ const VehicleList = () => {
         />
       </View>
 
-      <View className="bg-white justify-center items-center w-full shadow-sm rounded-sm p-2 flex-wrap overflow-scroll">
+      <View className="bg-white justify-center items-center w-full shadow-sm rounded-sm p-2 flex-wrap">
         <View className="justify-center items-center mb-2">
           <Text className="text-2xl font-semibold">Vehicles</Text>
         </View>
@@ -180,11 +180,11 @@ const VehicleList = () => {
       </View>
 
       <View className="flex-row items-center gap-2">
-        <View className="flex-1">
+        <View className="flex-1 h-12 rounded-sm border border-gray-200 bg-white">
           <Picker
             selectedValue={checkType}
             onValueChange={setCheckType}
-            className="h-14 shadow-sm rounded-sm outline-none"
+            style={{ height: 48, backgroundColor: "transparent" }}
           >
             <Picker.Item label="Check In" value="checkins" />
             <Picker.Item label="Check Out" value="checkouts" />

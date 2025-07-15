@@ -128,27 +128,25 @@ const updateMonthlyPrices = async (req, res) => {
 
 const getPrices = async (req, res) => {
   try {
-    const { adminId } = req.params;
-    const userId = req.user.role;
-    let priceDoc;
+    const user = req.user;
+    const adminId = user.role === "admin" ? user._id : user.adminId;
 
-    if (!(userId == "staff")) {
-      priceDoc = await Price.findOne({ adminId });
-    } else {
-      const staffs = await Staff.findOne({ _id: adminId });
-      priceDoc = await Admin.findOne({ _id: staffs.adminId });
+    if (!adminId) {
+      return res.status(400).json({ message: "Admin ID is required" });
     }
+
+    const priceDoc = await Price.findOne({ adminId });
 
     if (!priceDoc) {
-      return res
-        .status(404)
-        .json({ message: "No price data found for this admin" });
+      return res.status(404).json({ message: "Price not found for the admin" });
     }
 
-    return res.status(200).json(priceDoc);
+    res.status(200).json(priceDoc);
   } catch (error) {
-    console.error("Get Prices Error:", error);
-    return res.status(500).json({ error: "Internal Server Error" });
+    console.error("❌ Error in getPrice:", error.message);
+    res
+      .status(500)
+      .json({ message: "Internal Server Error", error: error.message });
   }
 };
 
