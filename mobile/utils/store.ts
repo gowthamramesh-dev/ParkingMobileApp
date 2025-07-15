@@ -4,14 +4,34 @@ import axios from "axios";
 
 const URL = "https://q8dcnx0t-5000.inc1.devtunnels.ms/";
 
-interface VehicleData {
-  checkins: any[];
-  checkouts: any[];
-  allData: any[];
-  fullData: any[];
-  PaymentMethod: any[];
-  VehicleTotalMoney: any[];
+interface StaffPerformance {
+  username: string;
+  checkIns: number;
+  checkOuts: number;
+  revenue: number;
 }
+
+interface TransactionLog {
+  id: string;
+  type: "checkin" | "checkout";
+  vehicleType: string;
+  timestamp: string;
+  staff: string;
+  amount: number;
+  paymentMethod: string | null;
+}
+
+interface VehicleData {
+  checkins: { [key: string]: number };
+  checkouts: { [key: string]: number };
+  allData: { [key: string]: number };
+  fullData: any[];
+  PaymentMethod: { [key: string]: number };
+  VehicleTotalMoney: { [key: string]: number };
+  staffData: StaffPerformance[];
+  transactionLogs: TransactionLog[];
+}
+
 interface ApiResponse<T = any> {
   success: boolean;
   error?: string;
@@ -39,6 +59,7 @@ interface MonthlyPass {
   paymentMode: string;
   isExpired: boolean;
 }
+
 interface FormData {
   name: string;
   vehicleNo: string;
@@ -51,6 +72,7 @@ interface FormData {
   amount?: number;
   transactionId?: string;
 }
+
 interface Staff {
   _id: string;
   username: string;
@@ -96,9 +118,9 @@ interface UserAuthState extends Partial<VehicleData> {
   report: Report | null;
   monthlyPassActive: MonthlyPass[] | null;
   monthlyPassExpired: MonthlyPass[] | null;
+  hydrated: boolean;
 
   fetchRevenueReport: () => Promise<void>;
-
   fetchCheckins: (vehicle: string, staffId?: string) => Promise<void>;
   fetchCheckouts: (vehicle: string, staffId?: string) => Promise<void>;
   vehicleList: (
@@ -106,7 +128,6 @@ interface UserAuthState extends Partial<VehicleData> {
     checkType: string,
     staffId?: string
   ) => Promise<{ success: boolean; error?: any }>;
-
   signup: (
     username: string,
     email: string,
@@ -116,8 +137,7 @@ interface UserAuthState extends Partial<VehicleData> {
     username: string,
     password: string
   ) => Promise<{ success: boolean; error?: any }>;
-  logOut: () => void;
-
+  logOut: () => Promise<void>;
   fetchPrices: (adminId: string, token: string) => Promise<void>;
   addDailyPrices: (
     adminId: string,
@@ -139,9 +159,9 @@ interface UserAuthState extends Partial<VehicleData> {
     monthlyPrices: any,
     token: string
   ) => Promise<string>;
-
   loadPricesIfNotSet: () => Promise<void>;
   getTodayVehicles: () => Promise<void>;
+  getDashboardData: () => Promise<void>;
   checkIn: (
     name: string,
     vehicleNo: string,
@@ -151,10 +171,7 @@ interface UserAuthState extends Partial<VehicleData> {
     days: string,
     amount: number
   ) => Promise<{ success: boolean; error?: any }>;
-
   checkOut: (tokenId: string) => Promise<{ success: boolean; error?: any }>;
-
-  // vehicleList: (vehicle: string, checkType: string) => Promise<{ success: boolean; error?: any }>;
   getAllStaffs: () => Promise<{
     success: boolean;
     staffs?: Staff[];
@@ -162,7 +179,6 @@ interface UserAuthState extends Partial<VehicleData> {
   }>;
   getStaffTodayVehicles: () => Promise<void>;
   getStaffTodayRevenue: () => Promise<void>;
-
   updateProfile: (
     id: string,
     username: string,
@@ -170,14 +186,11 @@ interface UserAuthState extends Partial<VehicleData> {
     avatar?: string,
     oldPassword?: string
   ) => Promise<{ success: boolean; error?: any }>;
-
   createStaff: (
     username: string,
     password: string,
     building: { name: string; location: string }
   ) => Promise<{ success: boolean; staff?: any; error?: any }>;
-
-  // createStaff: (username: string, password: string) => Promise<{ success: boolean; error?: any }>;
   updateStaff: (staffId: string, updates: any) => Promise<ApiResponse>;
   deleteStaff: (
     staffId: string
@@ -192,6 +205,7 @@ interface UserAuthState extends Partial<VehicleData> {
     passId: string,
     months: number
   ) => Promise<{ success: boolean; error?: string; data?: any }>;
+  restoreSession: () => Promise<void>;
 }
 
 const userAuthStore = create<UserAuthState>((set, get) => ({
@@ -205,15 +219,43 @@ const userAuthStore = create<UserAuthState>((set, get) => ({
   Reciept: {},
   staffs: [],
   permissions: [],
-  allData: [],
-  fullData: [],
-  VehicleTotalMoney: [],
-  PaymentMethod: [],
-  checkins: [],
-  checkouts: [],
+  checkins: {},
+  checkouts: {},
+  allData: {},
+  VehicleTotalMoney: {},
+  PaymentMethod: {},
+  staffData: [],
+  transactionLogs: [],
   report: null,
   monthlyPassActive: null,
   monthlyPassExpired: null,
+  hydrated: false,
+
+  restoreSession: async () => {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      const user = await AsyncStorage.getItem("user");
+
+      if (token && user) {
+        const decoded = JSON.parse(atob(token.split(".")[1]));
+        const exp = decoded?.exp;
+
+        if (exp && exp * 1000 > Date.now()) {
+          set({
+            token,
+            user: JSON.parse(user),
+            isLogged: true,
+          });
+        } else {
+          await get().logOut();
+        }
+      }
+    } catch (err) {
+      console.error("❌ Error restoring session:", err);
+    } finally {
+      set({ hydrated: true });
+    }
+  },
 
   loadPricesIfNotSet: async () => {
     const currentPrices = get().prices;
@@ -247,8 +289,6 @@ const userAuthStore = create<UserAuthState>((set, get) => ({
     try {
       set({ isLoading: true });
 
-      console.log("Logging in with:", { username, password });
-
       const res = await fetch(`${URL}api/loginUser`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -267,8 +307,8 @@ const userAuthStore = create<UserAuthState>((set, get) => ({
       await AsyncStorage.setItem("user", JSON.stringify(correctedUser));
       await AsyncStorage.setItem("token", data.token);
 
-      get().getTodayVehicles();
       await get().fetchPrices(correctedUser._id, data.token);
+      await get().getDashboardData();
 
       set({
         user: correctedUser,
@@ -286,7 +326,28 @@ const userAuthStore = create<UserAuthState>((set, get) => ({
     }
   },
 
-  // ✅ Fetch Prices by Admin ID
+  logOut: async () => {
+    await AsyncStorage.multiRemove(["user", "token", "prices"]);
+    set({
+      token: null,
+      user: null,
+      isLogged: false,
+      prices: {},
+      checkins: {},
+      checkouts: {},
+      allData: {},
+      VehicleListData: [],
+      Reciept: {},
+      staffs: [],
+      monthlyPassActive: null,
+      monthlyPassExpired: null,
+      VehicleTotalMoney: {},
+      PaymentMethod: {},
+      staffData: [],
+      transactionLogs: [],
+    });
+  },
+
   fetchPrices: async (adminId, token) => {
     set({ isLoading: true });
     try {
@@ -297,13 +358,10 @@ const userAuthStore = create<UserAuthState>((set, get) => ({
       });
       set({ priceData: res.data, isLoading: false });
     } catch (err: any) {
-      set({
-        isLoading: false,
-      });
+      set({ isLoading: false });
     }
   },
 
-  // ✅ Add Daily Prices
   addDailyPrices: async (adminId, dailyPrices, token) => {
     try {
       const res = await axios.post(
@@ -327,7 +385,6 @@ const userAuthStore = create<UserAuthState>((set, get) => ({
     }
   },
 
-  // ✅ Add Monthly Prices
   addMonthlyPrices: async (adminId, monthlyPrices, token) => {
     try {
       const res = await axios.post(
@@ -351,7 +408,6 @@ const userAuthStore = create<UserAuthState>((set, get) => ({
     }
   },
 
-  // ✅ Update Daily Prices
   updateDailyPrices: async (adminId, dailyPrices, token) => {
     try {
       const res = await axios.put(
@@ -375,7 +431,6 @@ const userAuthStore = create<UserAuthState>((set, get) => ({
     }
   },
 
-  // ✅ Update Monthly Prices
   updateMonthlyPrices: async (adminId, monthlyPrices, token) => {
     try {
       const res = await axios.put(
@@ -412,7 +467,7 @@ const userAuthStore = create<UserAuthState>((set, get) => ({
 
       set({ checkins: res.data.vehicle });
     } catch (error) {
-      set({ checkins: [] });
+      set({ checkins: {} });
     } finally {
       set({ isLoading: false });
     }
@@ -431,7 +486,7 @@ const userAuthStore = create<UserAuthState>((set, get) => ({
 
       set({ checkouts: res.data.vehicle });
     } catch (error) {
-      set({ checkouts: [] });
+      set({ checkouts: {} });
     } finally {
       set({ isLoading: false });
     }
@@ -470,7 +525,8 @@ const userAuthStore = create<UserAuthState>((set, get) => ({
     vehicleType,
     mobile,
     paymentMethod,
-    days
+    days,
+    amount
   ) => {
     try {
       set({ isLoading: true });
@@ -490,6 +546,7 @@ const userAuthStore = create<UserAuthState>((set, get) => ({
           mobile,
           paymentMethod,
           days,
+          amount,
         }),
       });
 
@@ -546,7 +603,6 @@ const userAuthStore = create<UserAuthState>((set, get) => ({
 
       if (!res.ok) throw new Error(data.message);
 
-      // ✅ Store embedded building info directly
       set({ staffs: data.staffs });
 
       return { success: true, staffs: data.staffs };
@@ -584,6 +640,7 @@ const userAuthStore = create<UserAuthState>((set, get) => ({
       console.log("Error:", err.message);
     }
   },
+
   getTodayVehicles: async () => {
     try {
       const token = get().token || (await AsyncStorage.getItem("token"));
@@ -604,6 +661,43 @@ const userAuthStore = create<UserAuthState>((set, get) => ({
       console.error("Today vehicle error:", err.message);
     }
   },
+
+  getDashboardData: async () => {
+    try {
+      set({ isLoading: true });
+      const token = get().token || (await AsyncStorage.getItem("token"));
+      if (!token) throw new Error("No token found");
+
+      const res = await axios.get(`${URL}api/getDashboardData`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      const { data } = res.data;
+      set({
+        checkins: data.checkins || {},
+        checkouts: data.checkouts || {},
+        allData: data.allData || {},
+        VehicleTotalMoney: data.VehicleTotalMoney || {},
+        PaymentMethod: data.PaymentMethod || {},
+        staffData: data.staffData || [],
+        transactionLogs: data.transactionLogs || [],
+      });
+    } catch (err: any) {
+      console.error("Dashboard data error:", err.message);
+      set({
+        checkins: {},
+        checkouts: {},
+        allData: {},
+        VehicleTotalMoney: {},
+        PaymentMethod: {},
+        staffData: [],
+        transactionLogs: [],
+      });
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
   updateProfile: async (id, username, newPassword, avatar, oldPassword) => {
     try {
       const token = get().token || (await AsyncStorage.getItem("token"));
@@ -638,7 +732,6 @@ const userAuthStore = create<UserAuthState>((set, get) => ({
       const adminId = admin?._id;
       if (!adminId) throw new Error("Admin ID not found");
 
-      // Now sending embedded building object
       const res = await fetch(`${URL}api/create/${adminId}`, {
         method: "POST",
         headers: {
@@ -648,7 +741,7 @@ const userAuthStore = create<UserAuthState>((set, get) => ({
         body: JSON.stringify({
           username,
           password,
-          building, // 👈 should be { name: "...", location: "..." }
+          building,
         }),
       });
 
@@ -671,7 +764,6 @@ const userAuthStore = create<UserAuthState>((set, get) => ({
         },
       });
 
-      // Directly use res.data
       const report = {
         role: res.data?.role,
         totalVehicles: res.data?.totalVehicles,
@@ -697,14 +789,13 @@ const userAuthStore = create<UserAuthState>((set, get) => ({
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(updates), // Can include: username, password, permissions, building
+        body: JSON.stringify(updates),
       });
 
       const data = await res.json();
 
       if (!res.ok) throw new Error(data.message);
 
-      // ✅ Update local staff list if present in Zustand
       set((state) => ({
         staffs: state.staffs.map((staff) =>
           staff._id === staffId ? { ...staff, ...data.staff } : staff
@@ -818,10 +909,8 @@ const userAuthStore = create<UserAuthState>((set, get) => ({
   },
 
   extendMonthlyPass: async (passId: string, months: number) => {
-    const setState = set;
-    setState({ isLoading: true });
-
     try {
+      set({ isLoading: true });
       const token = get().token || (await AsyncStorage.getItem("token"));
       if (!token) throw new Error("No token found");
 
@@ -840,33 +929,13 @@ const userAuthStore = create<UserAuthState>((set, get) => ({
         throw new Error(data.message || "Failed to extend pass");
       }
 
-      // Refresh active passes
       await get().getMonthlyPass("active");
 
       return { success: true };
     } catch (err: any) {
+      set({ isLoading: false });
       return { success: false, error: err.message };
-    } finally {
-      setState({ isLoading: false });
     }
-  },
-
-  logOut: async () => {
-    await AsyncStorage.multiRemove(["user", "token", "prices"]);
-    set({
-      token: null,
-      user: null,
-      isLogged: false,
-      prices: {},
-
-      checkins: [],
-      checkouts: [],
-      VehicleListData: [],
-      Reciept: {},
-      staffs: [],
-      monthlyPassActive: null,
-      monthlyPassExpired: null,
-    });
   },
 }));
 

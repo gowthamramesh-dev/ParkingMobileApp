@@ -44,6 +44,7 @@
     "expo-web-browser": "~14.2.0",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
+    "jwt-decode": "^4.0.0",
     "lottie-react-native": "^7.2.4",
     "morgan": "^1.10.0",
     "nativewind": "^4.1.23",

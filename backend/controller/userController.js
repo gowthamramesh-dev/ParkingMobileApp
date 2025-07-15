@@ -373,105 +373,229 @@ const getDashboardData = async (req, res) => {
 
     const admin = await Admin.findById(userId);
     if (!admin) {
-      return res
-        .status(404)
-        .json({ message: "Admin not found or staff not allowed" });
+      return res.status(404).json({ message: "Admin not found" });
     }
 
     const { date } = req.query; // Expect date in YYYY-MM-DD format
-    const startOfDay = date ? new Date(date) : new Date();
-    startOfDay.setHours(0, 0, 0, 0);
-    const endOfDay = new Date(startOfDay);
+    const selectedDate = date ? new Date(date) : new Date();
+    selectedDate.setHours(0, 0, 0, 0);
+    const endOfDay = new Date(selectedDate);
     endOfDay.setHours(23, 59, 59, 999);
 
-    // Fetch staff
-    const staffs = await Staff.find({ adminId: userId });
-
-    // Fetch monthly passes created by admin or their staff
-    const staffIds = staffs.map((staff) => staff._id);
-    const monthlyPasses = await monthlyPass.find({
-      createdBy: { $in: [userId, ...staffIds] },
-      createdAt: { $gte: startOfDay, $lte: endOfDay },
+    // Aggregate check-ins
+    const checkinsAggregate = await checkin.aggregate([
+      {
+        $match: {
+          adminId: userId.toString(),
+          entryDateTime: { $gte: selectedDate, $lte: endOfDay },
+        },
+      },
+      {
+        $group: {
+          _id: "$vehicleType",
+          count: { $sum: 1 },
+          totalAmount: { $sum: "$amount" },
+        },
+      },
+    ]);
+    const checkins = {};
+    const checkinsRevenue = {};
+    checkinsAggregate.forEach((item) => {
+      checkins[item._id] = item.count;
+      checkinsRevenue[item._id] = item.totalAmount;
     });
 
-    // Fetch check-ins and check-outs
-    const checkIns = await Checkin.find({
-      adminId: userId,
-      entryDateTime: { $gte: startOfDay, $lte: endOfDay },
+    // Aggregate check-outs
+    const checkoutsAggregate = await checkin.aggregate([
+      {
+        $match: {
+          adminId: userId.toString(),
+          isCheckedOut: true,
+          CheckOutTime: { $gte: selectedDate, $lte: endOfDay },
+        },
+      },
+      {
+        $group: {
+          _id: "$vehicleType",
+          count: { $sum: 1 },
+          totalExtraAmount: { $sum: "$extraAmount" },
+        },
+      },
+    ]);
+    const checkouts = {};
+    const checkoutsRevenue = {};
+    checkoutsAggregate.forEach((item) => {
+      checkouts[item._id] = item.count;
+      checkoutsRevenue[item._id] = item.totalExtraAmount;
     });
 
-    const checkOuts = await Checkout.find({
-      adminId: userId,
-      exitDateTime: { $gte: startOfDay, $lte: endOfDay },
+    // Combine for VehicleTotalMoney
+    const allVehicleTypes = new Set([
+      ...Object.keys(checkins),
+      ...Object.keys(checkouts),
+    ]);
+    const VehicleTotalMoney = {};
+    allVehicleTypes.forEach((vt) => {
+      VehicleTotalMoney[vt] =
+        (checkinsRevenue[vt] || 0) + (checkoutsRevenue[vt] || 0);
     });
 
-    // Calculate income for the selected date
-    const todayIncome =
-      checkIns.reduce((sum, checkin) => sum + (checkin.amount || 0), 0) +
-      monthlyPasses.reduce((sum, pass) => sum + (pass.amount || 0), 0);
+    // Aggregate payment methods from check-ins
+    const paymentCheckinsAggregate = await checkin.aggregate([
+      {
+        $match: {
+          adminId: userId.toString(),
+          entryDateTime: { $gte: selectedDate, $lte: endOfDay },
+        },
+      },
+      { $group: { _id: "$paymentMethod", total: { $sum: "$amount" } } },
+    ]);
+    const paymentFromCheckins = {};
+    paymentCheckinsAggregate.forEach((item) => {
+      paymentFromCheckins[item._id] = item.total;
+    });
 
-    // Calculate yesterday's income
-    const yesterdayStart = new Date(startOfDay);
-    yesterdayStart.setDate(startOfDay.getDate() - 1);
-    const yesterdayEnd = new Date(yesterdayStart);
-    yesterdayEnd.setHours(23, 59, 59, 999);
-    const yesterdayCheckIns = await Checkin.find({
-      adminId: userId,
-      entryDateTime: { $gte: yesterdayStart, $lte: yesterdayEnd },
+    // Aggregate payment methods from check-outs
+    const paymentCheckoutsAggregate = await checkin.aggregate([
+      {
+        $match: {
+          adminId: userId.toString(),
+          isCheckedOut: true,
+          CheckOutTime: { $gte: selectedDate, $lte: endOfDay },
+        },
+      },
+      { $group: { _id: "$paymentMethod", total: { $sum: "$extraAmount" } } },
+    ]);
+    const paymentFromCheckouts = {};
+    paymentCheckoutsAggregate.forEach((item) => {
+      paymentFromCheckouts[item._id] = item.total;
     });
-    const yesterdayMonthlyPasses = await MonthlyPass.find({
-      createdBy: { $in: [userId, ...staffIds] },
-      createdAt: { $gte: yesterdayStart, $lte: yesterdayEnd },
-    });
-    const yesterdayIncome =
-      yesterdayCheckIns.reduce(
-        (sum, checkin) => sum + (checkin.amount || 0),
-        0
-      ) +
-      yesterdayMonthlyPasses.reduce((sum, pass) => sum + (pass.amount || 0), 0);
 
-    // Calculate monthly income (for the month of the selected date)
-    const startOfMonth = new Date(
-      startOfDay.getFullYear(),
-      startOfDay.getMonth(),
-      1
-    );
-    const endOfMonth = new Date(
-      startOfDay.getFullYear(),
-      startOfDay.getMonth() + 1,
-      0,
-      23,
-      59,
-      59,
-      999
-    );
-    const monthlyCheckIns = await Checkin.find({
-      adminId: userId,
-      entryDateTime: { $gte: startOfMonth, $lte: endOfMonth },
+    // Combine for PaymentMethod
+    const allPaymentMethods = new Set([
+      ...Object.keys(paymentFromCheckins),
+      ...Object.keys(paymentFromCheckouts),
+    ]);
+    const PaymentMethod = {};
+    allPaymentMethods.forEach((pm) => {
+      PaymentMethod[pm] =
+        (paymentFromCheckins[pm] || 0) + (paymentFromCheckouts[pm] || 0);
     });
-    const monthlyPasss = await monthlyPass.find({
-      createdBy: { $in: [userId, ...staffIds] },
-      createdAt: { $gte: startOfMonth, $lte: endOfMonth },
-    });
-    const monthlyIncome =
-      monthlyCheckIns.reduce((sum, checkin) => sum + (checkin.amount || 0), 0) +
-      monthlyPasss.reduce((sum, pass) => sum + (pass.amount || 0), 0);
 
-    res.status(200).json({
+    // Aggregate staff from check-ins
+    const staffCheckinsAggregate = await checkin.aggregate([
+      {
+        $match: {
+          adminId: userId.toString(),
+          entryDateTime: { $gte: selectedDate, $lte: endOfDay },
+        },
+      },
+      {
+        $group: {
+          _id: "$checkInBy",
+          checkIns: { $sum: 1 },
+          revenue: { $sum: "$amount" },
+        },
+      },
+    ]);
+
+    // Aggregate staff from check-outs
+    const staffCheckoutsAggregate = await checkin.aggregate([
+      {
+        $match: {
+          adminId: userId.toString(),
+          isCheckedOut: true,
+          CheckOutTime: { $gte: selectedDate, $lte: endOfDay },
+        },
+      },
+      {
+        $group: {
+          _id: "$checkOutBy",
+          checkOuts: { $sum: 1 },
+          revenue: { $sum: "$extraAmount" },
+        },
+      },
+    ]);
+
+    // Combine staff data
+    const staffPerformance = {};
+    staffCheckinsAggregate.forEach((item) => {
+      staffPerformance[item._id] = {
+        username: item._id,
+        checkIns: item.checkIns,
+        checkOuts: 0,
+        revenue: item.revenue,
+      };
+    });
+    staffCheckoutsAggregate.forEach((item) => {
+      if (staffPerformance[item._id]) {
+        staffPerformance[item._id].checkOuts += item.checkOuts;
+        staffPerformance[item._id].revenue += item.revenue;
+      } else {
+        staffPerformance[item._id] = {
+          username: item._id,
+          checkIns: 0,
+          checkOuts: item.checkOuts,
+          revenue: item.revenue,
+        };
+      }
+    });
+    const staffData = Object.values(staffPerformance);
+
+    // Fetch transaction logs
+    const checkinLogs = await checkin
+      .find({
+        adminId: userId.toString(),
+        entryDateTime: { $gte: selectedDate, $lte: endOfDay },
+      })
+      .select("vehicleType entryDateTime checkInBy amount paymentMethod");
+    const checkoutLogs = await checkin
+      .find({
+        adminId: userId.toString(),
+        isCheckedOut: true,
+        CheckOutTime: { $gte: selectedDate, $lte: endOfDay },
+      })
+      .select("vehicleType CheckOutTime checkOutBy extraAmount paymentMethod");
+
+    const transactionLogs = [
+      ...checkinLogs.map((log) => ({
+        id: log._id.toString(),
+        type: "checkin",
+        vehicleType: log.vehicleType,
+        timestamp: log.entryDateTime,
+        staff: log.checkInBy,
+        amount: log.amount,
+        paymentMethod: log.paymentMethod,
+      })),
+      ...checkoutLogs.map((log) => ({
+        id: log._id.toString(),
+        type: "checkout",
+        vehicleType: log.vehicleType,
+        timestamp: log.CheckOutTime,
+        staff: log.checkOutBy,
+        amount: log.extraAmount,
+        paymentMethod: log.paymentMethod,
+      })),
+    ];
+
+    // Set allData to checkins (total check-ins per vehicle type)
+    const allData = { ...checkins };
+
+    return res.status(200).json({
       success: true,
       data: {
-        userId,
-        staffs,
-        monthlyPasses,
-        checkIns,
-        checkOuts,
-        todayIncome,
-        yesterdayIncome,
-        monthlyIncome,
+        date: selectedDate.toISOString().slice(0, 10),
+        checkins,
+        checkouts,
+        allData,
+        VehicleTotalMoney,
+        PaymentMethod,
+        staffData,
+        transactionLogs,
       },
     });
   } catch (error) {
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: "Error fetching dashboard data",
       error: error.message,
