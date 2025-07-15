@@ -33,7 +33,9 @@ const ChartSection = ({ title, data }: any) => {
   const normalizedData = counts.map((count) => count / max);
 
   return (
-    <View style={{ width: screenWidth, alignItems: "center", paddingVertical: 10 }}>
+    <View
+      style={{ width: screenWidth, alignItems: "center", paddingVertical: 10 }}
+    >
       <Text className="text-lg font-semibold mb-4">{title}</Text>
       <View className="rounded-md shadow-green-200 shadow-md">
         <ProgressChart

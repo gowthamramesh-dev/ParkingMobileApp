@@ -1,6 +1,3 @@
-
-
-
 import React, { useEffect, useState } from "react";
 import {
   View,
@@ -35,7 +32,7 @@ const VALID_IONICONS = new Set([
 const SafeIonicon = ({ name, size = 22, color = "#000" }) => {
   const isValid = VALID_IONICONS.has(name);
   if (!isValid) {
-    console.warn(`⚠️ Invalid Ionicon: ${name}`);
+    console.warn(` Invalid Ionicon: ${name}`);
   }
   return (
     <Ionicons
@@ -167,8 +164,10 @@ const VehicleScreen = () => {
   }, [isFocused, checkType, selected]);
 
   const getDataToShow = () => {
-    if (checkType === "checkins") return Array.isArray(checkins) ? checkins : [];
-    if (checkType === "checkouts") return Array.isArray(checkouts) ? checkouts : [];
+    if (checkType === "checkins")
+      return Array.isArray(checkins) ? checkins : [];
+    if (checkType === "checkouts")
+      return Array.isArray(checkouts) ? checkouts : [];
     return Array.isArray(VehicleListData) ? VehicleListData : [];
   };
 
@@ -308,4 +307,3 @@ const VehicleScreen = () => {
 };
 
 export default VehicleScreen;
-

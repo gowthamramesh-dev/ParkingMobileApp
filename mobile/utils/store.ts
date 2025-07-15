@@ -268,7 +268,7 @@ const userAuthStore = create<UserAuthState>((set, get) => ({
       await AsyncStorage.setItem("token", data.token);
 
       get().getTodayVehicles();
-      await get().fetchPrices(correctedUser._id, data.token); // ✅ fixed
+      await get().fetchPrices(correctedUser._id, data.token);
 
       set({
         user: correctedUser,
