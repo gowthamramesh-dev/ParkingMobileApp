@@ -10,7 +10,6 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 const SECRET_KEY = "your_secret_key";
 
-
 const addDailyPrices = async (req, res) => {
   try {
     const { adminId, dailyPrices } = req.body;
@@ -24,13 +23,20 @@ const addDailyPrices = async (req, res) => {
         dailyPrices,
       });
       await priceDoc.save();
-      return res.status(201).json({ message: "Daily prices added", data: priceDoc });
-    } else if (priceDoc.dailyPrices && Object.values(priceDoc.dailyPrices).some(val => val !== "0")) {
+      return res
+        .status(201)
+        .json({ message: "Daily prices added", data: priceDoc });
+    } else if (
+      priceDoc.dailyPrices &&
+      Object.values(priceDoc.dailyPrices).some((val) => val !== "0")
+    ) {
       return res.status(400).json({ message: "Daily prices already exist" });
     } else {
       priceDoc.dailyPrices = dailyPrices;
       await priceDoc.save();
-      return res.status(200).json({ message: "Daily prices set", data: priceDoc });
+      return res
+        .status(200)
+        .json({ message: "Daily prices set", data: priceDoc });
     }
   } catch (err) {
     console.error("Add Daily Prices Error:", err);
@@ -38,7 +44,7 @@ const addDailyPrices = async (req, res) => {
   }
 };
 
- const addMonthlyPrices = async (req, res) => {
+const addMonthlyPrices = async (req, res) => {
   try {
     const { adminId, monthlyPrices } = req.body;
 
@@ -51,13 +57,20 @@ const addDailyPrices = async (req, res) => {
         monthlyPrices,
       });
       await priceDoc.save();
-      return res.status(201).json({ message: "Monthly prices added", data: priceDoc });
-    } else if (priceDoc.monthlyPrices && Object.values(priceDoc.monthlyPrices).some(val => val !== "0")) {
+      return res
+        .status(201)
+        .json({ message: "Monthly prices added", data: priceDoc });
+    } else if (
+      priceDoc.monthlyPrices &&
+      Object.values(priceDoc.monthlyPrices).some((val) => val !== "0")
+    ) {
       return res.status(400).json({ message: "Monthly prices already exist" });
     } else {
       priceDoc.monthlyPrices = monthlyPrices;
       await priceDoc.save();
-      return res.status(200).json({ message: "Monthly prices set", data: priceDoc });
+      return res
+        .status(200)
+        .json({ message: "Monthly prices set", data: priceDoc });
     }
   } catch (err) {
     console.error("Add Monthly Prices Error:", err);
@@ -72,13 +85,17 @@ const updateDailyPrices = async (req, res) => {
     const priceDoc = await Price.findOne({ adminId });
 
     if (!priceDoc) {
-      return res.status(404).json({ message: "Price data not found for this admin" });
+      return res
+        .status(404)
+        .json({ message: "Price data not found for this admin" });
     }
 
     priceDoc.dailyPrices = dailyPrices;
     await priceDoc.save();
 
-    return res.status(200).json({ message: "Daily prices updated", data: priceDoc });
+    return res
+      .status(200)
+      .json({ message: "Daily prices updated", data: priceDoc });
   } catch (error) {
     console.error("Update Daily Error:", error);
     return res.status(500).json({ error: "Internal Server Error" });
@@ -92,13 +109,17 @@ const updateMonthlyPrices = async (req, res) => {
     const priceDoc = await Price.findOne({ adminId });
 
     if (!priceDoc) {
-      return res.status(404).json({ message: "Price data not found for this admin" });
+      return res
+        .status(404)
+        .json({ message: "Price data not found for this admin" });
     }
 
     priceDoc.monthlyPrices = monthlyPrices;
     await priceDoc.save();
 
-    return res.status(200).json({ message: "Monthly prices updated", data: priceDoc });
+    return res
+      .status(200)
+      .json({ message: "Monthly prices updated", data: priceDoc });
   } catch (error) {
     console.error("Update Monthly Error:", error);
     return res.status(500).json({ error: "Internal Server Error" });
@@ -108,11 +129,20 @@ const updateMonthlyPrices = async (req, res) => {
 const getPrices = async (req, res) => {
   try {
     const { adminId } = req.params;
+    const userId = req.user.role;
+    let priceDoc;
 
-    const priceDoc = await Price.findOne({ adminId });
+    if (!(userId == "staff")) {
+      priceDoc = await Price.findOne({ adminId });
+    } else {
+      const staffs = await Staff.findOne({ _id: adminId });
+      priceDoc = await Admin.findOne({ _id: staffs.adminId });
+    }
 
     if (!priceDoc) {
-      return res.status(404).json({ message: "No price data found for this admin" });
+      return res
+        .status(404)
+        .json({ message: "No price data found for this admin" });
     }
 
     return res.status(200).json(priceDoc);
@@ -121,7 +151,6 @@ const getPrices = async (req, res) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
-
 
 const registerAdmin = async (req, res) => {
   try {
@@ -457,7 +486,7 @@ export default {
   // updatePrice,
   // getPrice,
 
-   addDailyPrices,
+  addDailyPrices,
   addMonthlyPrices,
   updateDailyPrices,
   updateMonthlyPrices,
