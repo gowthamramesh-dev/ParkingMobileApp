@@ -148,6 +148,8 @@ router.post(
 router.get("/api/getMontlyPass/:id", verifyToken, passController.getMontlyPass);
 router.put("/api/extendPass/:id", verifyToken, passController.extendPass);
 
+router.get("/api/dashboard", verifyToken, userController.getDashboardData);
+
 export default router;
 
 // import express from "express";
