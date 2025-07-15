@@ -573,7 +573,7 @@ const getRevenueReport = async (req, res) => {
       name: v.name,
       numberPlate: v.vehicleNo,
       vehicleType: v.vehicleType,
-      amount: `₹${(v.amount ?? v.totalAmount ?? 0).toFixed(2)}`,
+      amount: ` ₹${(v.amount ?? v.totalAmount ?? 0).toFixed(2)}`,
       createdBy: v.checkedOutBy || "N/A",
     }));
 
