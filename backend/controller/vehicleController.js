@@ -20,20 +20,19 @@ const convertToISTString = (date) => {
 
 const Checkin = async (req, res) => {
   try {
-    const { name, vehicleNo, vehicleType, mobile, paymentMethod, days } =
-      req.body;
+    const {
+      name,
+      vehicleNo,
+      vehicleType,
+      mobile,
+      paymentMethod,
+      days,
+    } = req.body;
 
     const user = req.user;
 
     // ✅ Validate required fields
-    if (
-      !name ||
-      !vehicleType ||
-      !vehicleNo ||
-      !mobile ||
-      !paymentMethod ||
-      !days
-    ) {
+    if (!name || !vehicleType || !vehicleNo || !mobile || !paymentMethod || !days) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
@@ -59,10 +58,7 @@ const Checkin = async (req, res) => {
     // 🪵 Debug logs
     console.log("🧾 priceDoc:", priceDoc);
     console.log("🚗 vehicleType:", cleanedType);
-    console.log(
-      "🔑 dailyPrices keys:",
-      Object.keys(priceDoc?.dailyPrices || {})
-    );
+    console.log("🔑 dailyPrices keys:", Object.keys(priceDoc?.dailyPrices || {}));
     console.log("💰 rate value:", priceDoc?.dailyPrices?.[cleanedType]);
 
     // ✅ Guard clause for missing dailyPrices
@@ -140,6 +136,10 @@ const Checkin = async (req, res) => {
   }
 };
 
+
+
+
+
 const Checkout = async (req, res) => {
   try {
     const { tokenId } = req.body;
@@ -174,9 +174,7 @@ const Checkout = async (req, res) => {
     const priceData = await Price.findOne({ adminId });
 
     if (!priceData || typeof priceData.dailyPrices !== "object") {
-      return res
-        .status(404)
-        .json({ message: "No daily pricing info found for this admin" });
+      return res.status(404).json({ message: "No daily pricing info found for this admin" });
     }
 
     // ✅ Clean vehicleType before using it as key
@@ -187,9 +185,7 @@ const Checkout = async (req, res) => {
     const price = Number(priceStr);
 
     if (!priceStr || isNaN(price)) {
-      return res
-        .status(400)
-        .json({ message: `Invalid or missing price for ${vehicleType}` });
+      return res.status(400).json({ message: `Invalid or missing price for ${vehicleType}` });
     }
 
     // 4. Calculate charges
@@ -208,16 +204,12 @@ const Checkout = async (req, res) => {
       const pricePerMinute = price / 60;
       const chargeableMinutes = Math.max(1, Math.ceil(minutesUsed));
       totalAmount = parseFloat((chargeableMinutes * pricePerMinute).toFixed(2));
-      readableDuration = `${chargeableMinutes} minute${
-        chargeableMinutes > 1 ? "s" : ""
-      }`;
+      readableDuration = `${chargeableMinutes} minute${chargeableMinutes > 1 ? "s" : ""}`;
     } else {
       const days = timeDiffMs / (1000 * 60 * 60 * 24);
       const chargeableDays = Math.max(1, Math.ceil(days));
       totalAmount = chargeableDays * price;
-      readableDuration = `${chargeableDays} day${
-        chargeableDays > 1 ? "s" : ""
-      }`;
+      readableDuration = `${chargeableDays} day${chargeableDays > 1 ? "s" : ""}`;
     }
 
     // 5. Update checkout details
@@ -256,7 +248,6 @@ const Checkout = async (req, res) => {
     });
   }
 };
-
 const getCheckins = async (req, res) => {
   try {
     const userId = req.query.staffId || req.user._id; // ✅ Use staffId if passed
