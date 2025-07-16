@@ -7,7 +7,9 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "dev": "node index.js"
+    "dev": "nodemon index.js",
+    "start": "node index.js",
+    "build": "echo 'No build needed for this Node.js app'"
   },
   "dependencies": {
     "axios": "^1.10.0",

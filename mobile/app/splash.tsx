@@ -1,11 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import {
-  Text,
-  StatusBar,
-  Animated,
-  View,
-  Pressable,
-} from "react-native";
+import { Text, StatusBar, Animated, View, Pressable } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import Ionicons from "react-native-vector-icons/Ionicons";
@@ -70,8 +64,11 @@ const ParkingSplashScreen = () => {
         {/* Top Content */}
         <View className="items-center">
           <Animated.View
-            style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}
-             className="mt-6 px-2"
+            style={{
+              opacity: fadeAnim,
+              transform: [{ translateY: slideAnim }],
+            }}
+            className="mt-6 px-2"
           >
             <Text className="text-4xl text-black font-bold mb-2 text-center">
               Welcome to ParkEase
@@ -109,22 +106,23 @@ const ParkingSplashScreen = () => {
           </Animated.View>
         </View>
 
-       {/* Sign up Link with Icon and Outer Wrapper */}
-<View className="btn-outer w-full mb-10 border border-white px-6 py-3 rounded-full">
-  <Pressable
-    onPress={() => navigation.navigate("login")}
-    className="flex-row items-center justify-center"
-  >
-    <Ionicons
-      name="person-add"
-      size={22}
-      color="#fff"
-      style={{ marginRight: 8 }}
-    />
-    <Text className="text-white text-lg font-bold">Sign up</Text>
-  </Pressable>
-</View>
-
+        {/* Sign up Link with Icon and Outer Wrapper */}
+        <View className="btn-outer w-full mb-10 border border-white px-6 py-3 rounded-full">
+          <Pressable
+            onPress={() => navigation.navigate("login")}
+            className="flex-row items-center justify-center"
+          >
+            <Ionicons
+              name="person-add"
+              size={22}
+              color="#fff"
+              style={{ marginRight: 8 }}
+            />
+            <Text className="text-white text-lg font-bold">
+              Let&apos;s Start
+            </Text>
+          </Pressable>
+        </View>
       </View>
     </SafeAreaView>
   );
