@@ -20,20 +20,19 @@ const convertToISTString = (date) => {
 
 const Checkin = async (req, res) => {
   try {
-    const { name, vehicleNo, vehicleType, mobile, paymentMethod, days } =
-      req.body;
+    const {
+      name,
+      vehicleNo,
+      vehicleType,
+      mobile,
+      paymentMethod,
+      days,
+    } = req.body;
 
     const user = req.user;
 
     // ✅ Validate required fields
-    if (
-      !name ||
-      !vehicleType ||
-      !vehicleNo ||
-      !mobile ||
-      !paymentMethod ||
-      !days
-    ) {
+    if (!name || !vehicleType || !vehicleNo || !mobile || !paymentMethod || !days) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
@@ -59,10 +58,7 @@ const Checkin = async (req, res) => {
     // 🪵 Debug logs
     console.log("🧾 priceDoc:", priceDoc);
     console.log("🚗 vehicleType:", cleanedType);
-    console.log(
-      "🔑 dailyPrices keys:",
-      Object.keys(priceDoc?.dailyPrices || {})
-    );
+    console.log("🔑 dailyPrices keys:", Object.keys(priceDoc?.dailyPrices || {}));
     console.log("💰 rate value:", priceDoc?.dailyPrices?.[cleanedType]);
 
     // ✅ Guard clause for missing dailyPrices
@@ -140,6 +136,10 @@ const Checkin = async (req, res) => {
   }
 };
 
+
+
+
+
 const Checkout = async (req, res) => {
   try {
     const { tokenId } = req.body;
@@ -174,9 +174,7 @@ const Checkout = async (req, res) => {
     const priceData = await Price.findOne({ adminId });
 
     if (!priceData || typeof priceData.dailyPrices !== "object") {
-      return res
-        .status(404)
-        .json({ message: "No daily pricing info found for this admin" });
+      return res.status(404).json({ message: "No daily pricing info found for this admin" });
     }
 
     // ✅ Clean vehicleType before using it as key
@@ -187,9 +185,7 @@ const Checkout = async (req, res) => {
     const price = Number(priceStr);
 
     if (!priceStr || isNaN(price)) {
-      return res
-        .status(400)
-        .json({ message: `Invalid or missing price for ${vehicleType}` });
+      return res.status(400).json({ message: `Invalid or missing price for ${vehicleType}` });
     }
 
     // 4. Calculate charges
@@ -208,16 +204,12 @@ const Checkout = async (req, res) => {
       const pricePerMinute = price / 60;
       const chargeableMinutes = Math.max(1, Math.ceil(minutesUsed));
       totalAmount = parseFloat((chargeableMinutes * pricePerMinute).toFixed(2));
-      readableDuration = `${chargeableMinutes} minute${
-        chargeableMinutes > 1 ? "s" : ""
-      }`;
+      readableDuration = `${chargeableMinutes} minute${chargeableMinutes > 1 ? "s" : ""}`;
     } else {
       const days = timeDiffMs / (1000 * 60 * 60 * 24);
       const chargeableDays = Math.max(1, Math.ceil(days));
       totalAmount = chargeableDays * price;
-      readableDuration = `${chargeableDays} day${
-        chargeableDays > 1 ? "s" : ""
-      }`;
+      readableDuration = `${chargeableDays} day${chargeableDays > 1 ? "s" : ""}`;
     }
 
     // 5. Update checkout details
@@ -256,7 +248,6 @@ const Checkout = async (req, res) => {
     });
   }
 };
-
 const getCheckins = async (req, res) => {
   try {
     const userId = req.query.staffId || req.user._id; // ✅ Use staffId if passed
@@ -426,15 +417,15 @@ const getVehicleById = async (req, res) => {
   try {
     const { id } = req.params;
     const userId = req.query.staffId || req.user._id;
-
     const userRole = req.user.role;
 
     let query = { _id: id };
 
+    // ✅ Use correct field names
     if (userRole === "admin") {
-      query.adminRefId = userId;
+      query.adminId = userId;
     } else if (userRole === "staff") {
-      query.createdBy = userId;
+      query.checkInBy = userId;
     } else {
       return res.status(403).json({ message: "Invalid user role" });
     }
@@ -455,6 +446,8 @@ const getVehicleById = async (req, res) => {
       .json({ message: "Internal Server Error", error: error.message });
   }
 };
+
+
 
 const getVehicleByPlate = async (req, res) => {
   try {
@@ -489,18 +482,55 @@ const getVehicleByPlate = async (req, res) => {
   }
 };
 
+// const getVehicleByToken = async (req, res) => {
+//   try {
+//     const { tokenId } = req.params;
+//     const userId = new mongoose.Types.ObjectId(req.user._id); // ✅ Ensure it's ObjectId
+//     const userRole = req.user.role;
+
+//     let query = { tokenId };
+
+//     if (userRole === "admin") {
+//       query.adminRefId = userId;
+//     } else if (userRole === "staff") {
+//       query.createdBy = userId;
+//     } else {
+//       return res.status(403).json({ message: "Invalid user role" });
+//     }
+
+//     console.log("Query to MongoDB =>", query);
+
+//     const vehicle = await VehicleCheckin.findOne(query);
+
+//     if (!vehicle) {
+//       return res.status(404).json({
+//         message: "No vehicle found with this tokenId for your account",
+//       });
+//     }
+
+//     res.status(200).json({ vehicle });
+//   } catch (error) {
+//     console.error("getVehicleByToken error:", error);
+//     res
+//       .status(500)
+//       .json({ message: "Internal Server Error", error: error.message });
+//   }
+// };
+
+
 const getVehicleByToken = async (req, res) => {
   try {
     const { tokenId } = req.params;
-    const userId = new mongoose.Types.ObjectId(req.user._id); // ✅ Ensure it's ObjectId
+    const userId = new mongoose.Types.ObjectId(req.user._id);
     const userRole = req.user.role;
 
     let query = { tokenId };
 
+    // ✅ Match with saved field names in Checkin
     if (userRole === "admin") {
-      query.adminRefId = userId;
+      query.adminId = userId;
     } else if (userRole === "staff") {
-      query.createdBy = userId;
+      query.checkInBy = userId;
     } else {
       return res.status(403).json({ message: "Invalid user role" });
     }
@@ -524,14 +554,16 @@ const getVehicleByToken = async (req, res) => {
   }
 };
 
+
+
 const getVehicleByNumberPlate = async (req, res) => {
   try {
     const numberPlate = req.params.numberPlate.toUpperCase().replace(/\s/g, "");
     const userId = req.user._id;
 
     const vehicles = await VehicleCheckin.find({
-      vehicleNumber: numberPlate,
-      createdBy: userId,
+      vehicleNo: numberPlate,
+      checkInBy: userId,
     });
 
     if (!vehicles.length) {
