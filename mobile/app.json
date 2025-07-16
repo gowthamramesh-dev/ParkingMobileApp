@@ -21,9 +21,7 @@
         "CAMERA",
         "android.permission.CAMERA",
         "android.permission.RECORD_AUDIO",
-        "CAMERA",
-        "android.permission.CAMERA",
-        "android.permission.RECORD_AUDIO"
+        "INTERNET"
       ],
       "package": "com.gowthamrameshdev.mobile"
     },
@@ -43,12 +41,17 @@
           "backgroundColor": "#ffffff"
         }
       ],
-      [
-        "expo-camera"
-      ]
+      ["expo-camera"]
     ],
     "experiments": {
       "typedRoutes": true
-    }
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "0af9751f-5ad4-4a3d-9128-516e86dbc1b1"
+      }
+    },
+    "owner": "gowthamramesh"
   }
 }

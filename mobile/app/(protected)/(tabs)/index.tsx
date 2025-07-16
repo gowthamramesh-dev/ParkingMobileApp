@@ -6,10 +6,17 @@ import {
   View,
   TouchableOpacity,
   ScrollView,
+  LogBox,
 } from "react-native";
 import CheckIn from "@/components/CheckIn";
 import CheckOut from "@/components/CheckOut";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+
+LogBox.ignoreAllLogs(false);
+
+ErrorUtils.setGlobalHandler((error, isFatal) => {
+  console.log("❌ Global Error:", error.message);
+});
 
 const Index = () => {
   const [isCheck, setIsCheck] = useState(true);
