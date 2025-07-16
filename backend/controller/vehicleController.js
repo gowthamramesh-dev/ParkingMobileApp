@@ -417,15 +417,15 @@ const getVehicleById = async (req, res) => {
   try {
     const { id } = req.params;
     const userId = req.query.staffId || req.user._id;
-
     const userRole = req.user.role;
 
     let query = { _id: id };
 
+    // ✅ Use correct field names
     if (userRole === "admin") {
-      query.adminRefId = userId;
+      query.adminId = userId;
     } else if (userRole === "staff") {
-      query.createdBy = userId;
+      query.checkInBy = userId;
     } else {
       return res.status(403).json({ message: "Invalid user role" });
     }
@@ -446,6 +446,8 @@ const getVehicleById = async (req, res) => {
       .json({ message: "Internal Server Error", error: error.message });
   }
 };
+
+
 
 const getVehicleByPlate = async (req, res) => {
   try {
@@ -480,18 +482,55 @@ const getVehicleByPlate = async (req, res) => {
   }
 };
 
+// const getVehicleByToken = async (req, res) => {
+//   try {
+//     const { tokenId } = req.params;
+//     const userId = new mongoose.Types.ObjectId(req.user._id); // ✅ Ensure it's ObjectId
+//     const userRole = req.user.role;
+
+//     let query = { tokenId };
+
+//     if (userRole === "admin") {
+//       query.adminRefId = userId;
+//     } else if (userRole === "staff") {
+//       query.createdBy = userId;
+//     } else {
+//       return res.status(403).json({ message: "Invalid user role" });
+//     }
+
+//     console.log("Query to MongoDB =>", query);
+
+//     const vehicle = await VehicleCheckin.findOne(query);
+
+//     if (!vehicle) {
+//       return res.status(404).json({
+//         message: "No vehicle found with this tokenId for your account",
+//       });
+//     }
+
+//     res.status(200).json({ vehicle });
+//   } catch (error) {
+//     console.error("getVehicleByToken error:", error);
+//     res
+//       .status(500)
+//       .json({ message: "Internal Server Error", error: error.message });
+//   }
+// };
+
+
 const getVehicleByToken = async (req, res) => {
   try {
     const { tokenId } = req.params;
-    const userId = new mongoose.Types.ObjectId(req.user._id); // ✅ Ensure it's ObjectId
+    const userId = new mongoose.Types.ObjectId(req.user._id);
     const userRole = req.user.role;
 
     let query = { tokenId };
 
+    // ✅ Match with saved field names in Checkin
     if (userRole === "admin") {
-      query.adminRefId = userId;
+      query.adminId = userId;
     } else if (userRole === "staff") {
-      query.createdBy = userId;
+      query.checkInBy = userId;
     } else {
       return res.status(403).json({ message: "Invalid user role" });
     }
@@ -515,14 +554,16 @@ const getVehicleByToken = async (req, res) => {
   }
 };
 
+
+
 const getVehicleByNumberPlate = async (req, res) => {
   try {
     const numberPlate = req.params.numberPlate.toUpperCase().replace(/\s/g, "");
     const userId = req.user._id;
 
     const vehicles = await VehicleCheckin.find({
-      vehicleNumber: numberPlate,
-      createdBy: userId,
+      vehicleNo: numberPlate,
+      checkInBy: userId,
     });
 
     if (!vehicles.length) {

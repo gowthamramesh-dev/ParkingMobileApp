@@ -33,7 +33,7 @@ router.get(
 
 // New routes
 router.get(
-  "/api/vehicle/:id",
+  "/api/vehicle/:numberPlate",
   verifyToken,
   vehicleController.getVehicleByNumberPlate
 );
@@ -104,6 +104,8 @@ router.get(
   verifyStaff,
   staffController.getStaffTodayRevenue
 );
+
+
 router.post(
   "/api/register",
   upload.single("profileImage"),
