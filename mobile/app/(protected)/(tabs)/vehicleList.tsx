@@ -7,6 +7,7 @@ import {
   ActivityIndicator,
   TextInput,
   Platform,
+  StyleSheet,
 } from "react-native";
 import React, { useEffect, useState } from "react";
 import * as Clipboard from "expo-clipboard";
@@ -31,62 +32,53 @@ const CheckinCard = ({ item }: any) => {
   );
 
   return (
-    <View className="bg-white shadow-lg rounded-md p-3 mx-4 mb-4 space-y-2">
-      <View className="flex-row justify-between items-center">
-        <View className="flex-row gap-2 justify-center items-center">
-          <Text className="text-lg font-semibold text-gray-900">
-            {item.name}
-          </Text>
+    <View style={styles.cardContainer}>
+      <View style={styles.cardHeader}>
+        <View style={styles.nameStatusContainer}>
+          <Text style={styles.vehicleName}>{item.name}</Text>
           <Text
-            className={`px-2 py-1 rounded-full text-xs font-semibold ${
-              item.isCheckedOut
-                ? "bg-red-100 text-red-700"
-                : "bg-green-100 text-green-700"
-            }`}
+            style={[
+              styles.status,
+              item.isCheckedOut ? styles.statusOut : styles.statusActive,
+            ]}
           >
             {item.isCheckedOut ? "Checked Out" : "Active"}
           </Text>
         </View>
-        <View className="flex-row justify-center items-center gap-1">
-          <Text className="text-md text-gray-500">{item.vehicleNo}</Text>
+        <View style={styles.vehicleNoContainer}>
+          <Text style={styles.vehicleNo}>{item.vehicleNo}</Text>
           <TouchableOpacity
             onPress={() => {
               Clipboard.setStringAsync(item.tokenId);
               Alert.alert("Copied!", ` ${item.tokenId} copied to clipboard.`);
             }}
           >
-            <Text className="text-xs text-green-500">
+            <Text style={styles.tokenCopy}>
               <Ionicons name="copy-outline" size={12} /> Token
             </Text>
           </TouchableOpacity>
         </View>
       </View>
 
-      <View className="bg-gray-100 p-1 rounded-sm">
-        <View className="flex-row justify-between">
-          <Text className="text-sm text-gray-700 capitalize">
-            {item.vehicleType}
-          </Text>
-          <Text className="text-sm text-gray-500">{formattedDate}</Text>
+      <View style={styles.detailsContainer}>
+        <View style={styles.rowBetween}>
+          <Text style={styles.grayText}>{item.vehicleType}</Text>
+          <Text style={styles.grayText}>{formattedDate}</Text>
         </View>
-        <View className="mt-1 space-y-1">
-          <View className="flex-row justify-between">
-            <Text className="text-sm text-gray-700">Paid Days</Text>
-            <Text className="text-sm font-medium text-gray-800">
-              {item.paidDays}
-            </Text>
+        <View style={styles.detailRowGroup}>
+          <View style={styles.rowBetween}>
+            <Text style={styles.grayText}>Paid Days</Text>
+            <Text style={styles.boldText}>{item.paidDays}</Text>
           </View>
-          <View className="flex-row justify-between">
-            <Text className="text-sm text-gray-700">Rate</Text>
-            <Text className="text-sm font-medium text-gray-800">
+          <View style={styles.rowBetween}>
+            <Text style={styles.grayText}>Rate</Text>
+            <Text style={styles.boldText}>
               ₹{(+item.perDayRate / +item.paidDays).toFixed(2)}/day
             </Text>
           </View>
-          <View className="flex-row justify-between">
-            <Text className="text-sm text-gray-700">Total Paid</Text>
-            <Text className="text-sm font-semibold text-green-600">
-              ₹{item.amount}
-            </Text>
+          <View style={styles.rowBetween}>
+            <Text style={styles.grayText}>Total Paid</Text>
+            <Text style={styles.greenText}>₹{item.amount}</Text>
           </View>
         </View>
       </View>
@@ -128,20 +120,20 @@ const VehicleList = () => {
   }, [checkType]);
 
   return (
-    <View className="flex-1 bg-[#F3F4F6] px-4 py-4 gap-3">
-      <View className="bg-white flex-row px-2 items-center rounded-sm">
+    <View style={styles.container}>
+      <View style={styles.searchBox}>
         <Ionicons name="search-outline" size={24} />
         <TextInput
           placeholder="Search vehicle"
           value={search}
           onChangeText={setSearch}
-          className="rounded text-base flex-1 px-3 h-12 bg-white"
+          style={styles.searchInput}
         />
       </View>
 
-      <View className="bg-white justify-center items-center w-full shadow-sm rounded-sm p-2 flex-wrap">
-        <View className="justify-center items-center mb-2">
-          <Text className="text-2xl font-semibold">Vehicles</Text>
+      <View style={styles.vehicleFilterBox}>
+        <View style={styles.centeredTextBox}>
+          <Text style={styles.vehicleTitle}>Vehicles</Text>
         </View>
 
         <FlatList
@@ -152,9 +144,10 @@ const VehicleList = () => {
             const isSelected = selected === item.value;
             return (
               <TouchableOpacity
-                className={`mx-2 items-center justify-center px-3 py-1 rounded-lg ${
-                  isSelected ? "bg-green-600" : "bg-green-400"
-                }`}
+                style={[
+                  styles.vehicleType,
+                  { backgroundColor: isSelected ? "#059669" : "#4ade80" },
+                ]}
                 onPress={() => {
                   setSelected(item.value);
                   handleList(item.value);
@@ -165,11 +158,7 @@ const VehicleList = () => {
                   size={22}
                   color={isSelected ? "#fff" : "#000"}
                 />
-                <Text
-                  className={`text-base ${
-                    isSelected ? "text-white" : "text-black"
-                  }`}
-                >
+                <Text style={{ color: isSelected ? "#fff" : "#000" }}>
                   {item.name}
                 </Text>
               </TouchableOpacity>
@@ -179,8 +168,8 @@ const VehicleList = () => {
         />
       </View>
 
-      <View className="flex-row items-center gap-2">
-        <View className="flex-1 h-15 rounded-sm border border-gray-200 bg-white">
+      <View style={styles.rowFilter}>
+        <View style={styles.pickerWrapper}>
           <Picker
             selectedValue={checkType}
             onValueChange={setCheckType}
@@ -192,9 +181,9 @@ const VehicleList = () => {
         </View>
         <TouchableOpacity
           onPress={() => setShowDatePicker(true)}
-          className="bg-green-100 px-3 py-2 rounded shadow-sm"
+          style={styles.dateBtn}
         >
-          <Text className="text-sm">
+          <Text style={styles.dateBtnText}>
             {filterDate ? format(filterDate, "MMM dd, yyyy") : "Pick Date"}
           </Text>
         </TouchableOpacity>
@@ -214,11 +203,11 @@ const VehicleList = () => {
         />
       )}
 
-      <View className="flex-1 bg-white">
+      <View style={styles.resultContainer}>
         {loading ? (
-          <View className="flex-1 justify-center items-center">
+          <View style={styles.centeredContent}>
             <ActivityIndicator size="large" color="#10B981" />
-            <Text className="mt-2 text-gray-500">Loading Vehicles...</Text>
+            <Text style={styles.grayText}>Loading Vehicles...</Text>
           </View>
         ) : VehicleListData && VehicleListData.length > 0 ? (
           <FlatList
@@ -240,15 +229,102 @@ const VehicleList = () => {
             contentContainerStyle={{ paddingVertical: 12 }}
           />
         ) : (
-          <View className="flex-1 justify-center items-center">
-            <Text className="text-gray-500 text-base">
-              No vehicle data found
-            </Text>
+          <View style={styles.centeredContent}>
+            <Text style={styles.grayText}>No vehicle data found</Text>
           </View>
         )}
       </View>
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: "#F3F4F6", padding: 16, gap: 12 },
+  searchBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "white",
+    borderRadius: 4,
+    paddingHorizontal: 8,
+  },
+  searchInput: { flex: 1, fontSize: 16, height: 48, paddingLeft: 8 },
+  vehicleFilterBox: {
+    backgroundColor: "white",
+    alignItems: "center",
+    borderRadius: 4,
+    padding: 8,
+  },
+  centeredTextBox: { alignItems: "center", marginBottom: 8 },
+  vehicleTitle: { fontSize: 20, fontWeight: "600" },
+  vehicleType: {
+    marginHorizontal: 8,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 12,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  rowFilter: { flexDirection: "row", alignItems: "center", gap: 8 },
+  pickerWrapper: {
+    flex: 1,
+    height: 60,
+    backgroundColor: "white",
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+    borderRadius: 4,
+  },
+  dateBtn: {
+    backgroundColor: "#d1fae5",
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 4,
+    elevation: 1,
+  },
+  dateBtnText: { fontSize: 14 },
+  resultContainer: { flex: 1, backgroundColor: "white" },
+  centeredContent: { flex: 1, justifyContent: "center", alignItems: "center" },
+  grayText: { color: "#6b7280", fontSize: 14, marginTop: 8 },
+  cardContainer: {
+    backgroundColor: "white",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+    borderRadius: 8,
+    padding: 12,
+    marginHorizontal: 16,
+    marginBottom: 12,
+    gap: 8,
+  },
+  cardHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  nameStatusContainer: {
+    flexDirection: "row",
+    gap: 8,
+    alignItems: "center",
+  },
+  vehicleName: { fontSize: 18, fontWeight: "600", color: "#111827" },
+  status: {
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    fontSize: 12,
+    borderRadius: 999,
+    fontWeight: "600",
+  },
+  statusOut: { backgroundColor: "#fee2e2", color: "#b91c1c" },
+  statusActive: { backgroundColor: "#d1fae5", color: "#047857" },
+  vehicleNoContainer: { flexDirection: "row", alignItems: "center", gap: 4 },
+  vehicleNo: { fontSize: 16, color: "#6b7280" },
+  tokenCopy: { fontSize: 12, color: "#10b981" },
+  detailsContainer: { backgroundColor: "#f3f4f6", padding: 8, borderRadius: 4 },
+  rowBetween: { flexDirection: "row", justifyContent: "space-between" },
+  detailRowGroup: { marginTop: 4, gap: 4 },
+  boldText: { fontWeight: "500", color: "#1f2937" },
+  greenText: { fontWeight: "600", color: "#059669" },
+});
 
 export default VehicleList;

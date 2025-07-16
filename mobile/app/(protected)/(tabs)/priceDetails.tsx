@@ -7,31 +7,17 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
+  StyleSheet,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { Ionicons } from "@expo/vector-icons";
 import Toast from "react-native-toast-message";
-import userAuthStore from "@/utils/store"; // adjust path to your store
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
-import { Ionicons } from "@expo/vector-icons";
+import userAuthStore from "@/utils/store";
 
-type VehicleType = "cycle" | "bike" | "car" | "van" | "lorry" | "bus";
-
-type PriceForm = {
-  [key in VehicleType]: string;
-};
-
-const vehicleTypes: VehicleType[] = [
-  "cycle",
-  "bike",
-  "car",
-  "van",
-  "lorry",
-  "bus",
-];
+const vehicleTypes = ["cycle", "bike", "car", "van", "lorry", "bus"];
 
 const PriceDetails = () => {
-  const navigation = useNavigation();
   const {
     fetchPrices,
     addDailyPrices,
@@ -41,7 +27,7 @@ const PriceDetails = () => {
     priceData,
   } = userAuthStore();
 
-  const [dailyForm, setDailyForm] = useState<PriceForm>({
+  const [dailyForm, setDailyForm] = useState({
     cycle: "",
     bike: "",
     car: "",
@@ -49,8 +35,7 @@ const PriceDetails = () => {
     lorry: "",
     bus: "",
   });
-
-  const [monthlyForm, setMonthlyForm] = useState<PriceForm>({
+  const [monthlyForm, setMonthlyForm] = useState({
     cycle: "",
     bike: "",
     car: "",
@@ -58,43 +43,31 @@ const PriceDetails = () => {
     lorry: "",
     bus: "",
   });
-
-  const [activeTab, setActiveTab] = useState<"daily" | "monthly">("daily");
+  const [activeTab, setActiveTab] = useState("daily");
 
   useEffect(() => {
     const loadPrices = async () => {
       const token = await AsyncStorage.getItem("token");
       const user = JSON.parse(await AsyncStorage.getItem("user"));
       if (!token || !user) return;
-
       await fetchPrices(user._id, token);
     };
-
     loadPrices();
   }, []);
 
   useEffect(() => {
-    if (priceData?.dailyPrices) {
+    if (priceData?.dailyPrices)
       setDailyForm({ ...dailyForm, ...priceData.dailyPrices });
-    }
-    if (priceData?.monthlyPrices) {
+    if (priceData?.monthlyPrices)
       setMonthlyForm({ ...monthlyForm, ...priceData.monthlyPrices });
-    }
   }, [priceData]);
 
-  const handleChange = (
-    type: VehicleType,
-    value: string,
-    mode: "daily" | "monthly"
-  ) => {
-    if (mode === "daily") {
-      setDailyForm((prev) => ({ ...prev, [type]: value }));
-    } else {
-      setMonthlyForm((prev) => ({ ...prev, [type]: value }));
-    }
+  const handleChange = (type, value, mode) => {
+    if (mode === "daily") setDailyForm((prev) => ({ ...prev, [type]: value }));
+    else setMonthlyForm((prev) => ({ ...prev, [type]: value }));
   };
 
-  const isFormValid = (mode: "daily" | "monthly") => {
+  const isFormValid = (mode) => {
     const form = mode === "daily" ? dailyForm : monthlyForm;
     return vehicleTypes.every((type) => form[type].trim() !== "");
   };
@@ -102,117 +75,95 @@ const PriceDetails = () => {
   const handleAdd = async () => {
     const token = await AsyncStorage.getItem("token");
     const user = JSON.parse(await AsyncStorage.getItem("user"));
-
     if (!token || !user) return;
-
     try {
-      if (activeTab === "daily") {
-        await addDailyPrices(user._id, dailyForm, token);
-      } else {
-        await addMonthlyPrices(user._id, monthlyForm, token);
-      }
-
+      activeTab === "daily"
+        ? await addDailyPrices(user._id, dailyForm, token)
+        : await addMonthlyPrices(user._id, monthlyForm, token);
       Toast.show({
         type: "success",
         text1: "Success",
         text2: `${activeTab} prices added successfully ✅`,
       });
     } catch (err) {
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: String(err),
-      });
+      Toast.show({ type: "error", text1: "Error", text2: String(err) });
     }
   };
 
   const handleUpdate = async () => {
     const token = await AsyncStorage.getItem("token");
     const user = JSON.parse(await AsyncStorage.getItem("user"));
-
     if (!token || !user) return;
-
     try {
-      if (activeTab === "daily") {
-        await updateDailyPrices(user._id, dailyForm, token);
-      } else {
-        await updateMonthlyPrices(user._id, monthlyForm, token);
-      }
-
+      activeTab === "daily"
+        ? await updateDailyPrices(user._id, dailyForm, token)
+        : await updateMonthlyPrices(user._id, monthlyForm, token);
       Toast.show({
         type: "success",
         text1: "Success",
         text2: `${activeTab} prices updated successfully ✅`,
       });
     } catch (err) {
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: String(err),
-      });
+      Toast.show({ type: "error", text1: "Error", text2: String(err) });
     }
   };
 
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : undefined}
-      className="bg-[#F3F4F6] py-4 flex-1 px-4"
+      style={styles.container}
     >
-      <View className="gap-5">
-        <View className="bg-white py-4 px-4 rounded-sm shadow-sm">
-          <View className="flex-row items-center justify-between">
-            {/* Back Button */}
-            <TouchableOpacity onPress={() => router.back()}>
-              <Ionicons name="arrow-back" size={24} color="black" />
-            </TouchableOpacity>
-
-            {/* Title Centered */}
-            <Text className="text-xl font-semibold text-center flex-1">
-              Manage Price List
-            </Text>
-
-            <Ionicons name="arrow-back" size={24} color="transparent" />
-          </View>
+      <View style={styles.innerContainer}>
+        <View style={styles.headerBox}>
+          <TouchableOpacity onPress={() => router.back()}>
+            <Ionicons name="arrow-back" size={24} color="black" />
+          </TouchableOpacity>
+          <Text style={styles.headerTitle}>Manage Price List</Text>
+          <Ionicons name="arrow-back" size={24} color="transparent" />
         </View>
 
-        <ScrollView className="">
-          <View className="flex-row shadow-md justify-around mb-6">
+        <ScrollView>
+          <View style={styles.tabRow}>
             <TouchableOpacity
-              className={`flex-1 p-3 rounded-l-md ${
-                activeTab === "daily" ? "bg-green-600" : "bg-white"
-              }`}
+              style={[
+                styles.tabButton,
+                activeTab === "daily" ? styles.activeTab : styles.inactiveTab,
+              ]}
               onPress={() => setActiveTab("daily")}
             >
               <Text
-                className={`text-center text-lg font-bold ${
-                  activeTab === "daily" ? "text-white" : "text-green-800"
-                }`}
+                style={
+                  activeTab === "daily"
+                    ? styles.activeTabText
+                    : styles.inactiveTabText
+                }
               >
                 Daily Prices
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
-              className={`flex-1 p-3 rounded-r-md ${
-                activeTab === "monthly" ? "bg-green-600" : "bg-white"
-              }`}
+              style={[
+                styles.tabButton,
+                activeTab === "monthly" ? styles.activeTab : styles.inactiveTab,
+              ]}
               onPress={() => setActiveTab("monthly")}
             >
               <Text
-                className={`text-center text-lg font-bold ${
-                  activeTab === "monthly" ? "text-white" : "text-green-800"
-                }`}
+                style={
+                  activeTab === "monthly"
+                    ? styles.activeTabText
+                    : styles.inactiveTabText
+                }
               >
                 Monthly Prices
               </Text>
             </TouchableOpacity>
           </View>
-          {/* Input Section */}
-          <View className="bg-white shadow rounded-lg px-4 py-4 mb-6">
+
+          <View style={styles.formBox}>
             {vehicleTypes.map((type) => (
-              <View key={type} className="mb-4">
-                <Text className="text-base font-semibold text-gray-800 capitalize mb-1">
-                  {type}
-                </Text>
+              <View key={type} style={styles.inputGroup}>
+                <Text style={styles.inputLabel}>{type}</Text>
                 <TextInput
                   value={
                     activeTab === "daily" ? dailyForm[type] : monthlyForm[type]
@@ -220,42 +171,106 @@ const PriceDetails = () => {
                   onChangeText={(val) => handleChange(type, val, activeTab)}
                   placeholder={`Enter ${type} ${activeTab} price`}
                   keyboardType="numeric"
-                  className="border border-gray-300 rounded px-4 py-2 bg-blue-100"
+                  style={styles.inputField}
                 />
               </View>
             ))}
           </View>
-          {/* Buttons */}
-          <View className="flex-row justify-between gap-4 mb-4">
+
+          <View style={styles.buttonRow}>
             <TouchableOpacity
-              className={`flex-1 bg-green-600 py-4 rounded-sm ${
-                !isFormValid(activeTab) ? "opacity-50" : ""
-              }`}
+              style={[
+                styles.actionButton,
+                !isFormValid(activeTab) && styles.disabledButton,
+              ]}
               onPress={handleAdd}
               disabled={!isFormValid(activeTab)}
             >
-              <Text className="text-center text-white font-semibold text-lg">
-                Add Price
-              </Text>
+              <Text style={styles.buttonText}>Add Price</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              className={`flex-1 bg-green-500 py-4 rounded-sm ${
-                !isFormValid(activeTab) ? "opacity-50" : ""
-              }`}
+              style={[
+                styles.actionButton,
+                !isFormValid(activeTab) && styles.disabledButton,
+              ]}
               onPress={handleUpdate}
               disabled={!isFormValid(activeTab)}
             >
-              <Text className="text-center text-white font-semibold text-lg">
-                Update Price
-              </Text>
+              <Text style={styles.buttonText}>Update Price</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
       </View>
-
       <Toast />
     </KeyboardAvoidingView>
   );
 };
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: "#F3F4F6" },
+  innerContainer: { padding: 16, flex: 1 },
+  headerBox: {
+    backgroundColor: "white",
+    padding: 16,
+    borderRadius: 4,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    elevation: 2,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: "600",
+    flex: 1,
+    textAlign: "center",
+  },
+  tabRow: {
+    flexDirection: "row",
+    marginTop: 20,
+    marginBottom: 16,
+    borderRadius: 4,
+    overflow: "hidden",
+  },
+  tabButton: { flex: 1, paddingVertical: 12, alignItems: "center" },
+  activeTab: { backgroundColor: "#16a34a" },
+  inactiveTab: { backgroundColor: "white" },
+  activeTabText: { color: "white", fontWeight: "700", fontSize: 16 },
+  inactiveTabText: { color: "#065f46", fontWeight: "700", fontSize: 16 },
+  formBox: {
+    backgroundColor: "white",
+    borderRadius: 8,
+    padding: 16,
+    elevation: 1,
+  },
+  inputGroup: { marginBottom: 16 },
+  inputLabel: {
+    fontSize: 16,
+    fontWeight: "600",
+    marginBottom: 4,
+    textTransform: "capitalize",
+  },
+  inputField: {
+    backgroundColor: "#DBEAFE",
+    borderRadius: 4,
+    padding: 10,
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+  },
+  buttonRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: 12,
+    marginVertical: 24,
+  },
+  actionButton: {
+    flex: 1,
+    backgroundColor: "#16a34a",
+    paddingVertical: 14,
+    borderRadius: 6,
+    alignItems: "center",
+  },
+  disabledButton: { opacity: 0.5 },
+  buttonText: { color: "white", fontSize: 16, fontWeight: "600" },
+});
 
 export default PriceDetails;

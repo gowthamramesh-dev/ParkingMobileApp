@@ -1,32 +1,21 @@
 import React, { useEffect, useState } from "react";
-import { MaterialIcons } from "@expo/vector-icons";
 import {
   View,
   Text,
   TouchableOpacity,
   FlatList,
   ActivityIndicator,
+  StyleSheet,
+  Modal,
 } from "react-native";
+import { MaterialIcons } from "@expo/vector-icons";
 import MonthlyPassModal from "../../../components/monthlyPassModal";
 import userAuthStore from "@/utils/store";
 import { Toast } from "toastify-react-native";
 
-interface Pass {
-  _id: string;
-  name: string;
-  vehicleNo: string;
-  mobile: string;
-  duration: number;
-  startDate: string;
-  endDate: string;
-  amount: number;
-  paymentMode: string;
-  isExpired: boolean;
-}
-
 const TABS = ["create", "active", "expired"] as const;
 
-const MonthlyPass: React.FC = () => {
+const MonthlyPass = () => {
   const [isModalVisible, setModalVisible] = useState(false);
   const [activeTab, setActiveTab] = useState<(typeof TABS)[number]>("active");
   const [editPassId, setEditPassId] = useState<string | null>(null);
@@ -74,33 +63,37 @@ const MonthlyPass: React.FC = () => {
     }, 2000);
   };
 
-  const renderPassItem = ({ item }: { item: Pass }) => {
-    const cardBg = item.isExpired ? "bg-gray-300" : "bg-green-500";
-    const textColor = item.isExpired ? "text-black" : "text-white";
+  const renderPassItem = ({ item }: any) => {
+    const cardStyles = [
+      styles.passCard,
+      { backgroundColor: item.isExpired ? "#D1D5DB" : "#22C55E" },
+    ];
+    const textColor = item.isExpired ? "#000" : "#fff";
 
     return (
-      <View
-        className={`mx-4 my-3 rounded-md ${cardBg} shadow-lg p-5 relative overflow-hidden`}
-      >
-        <View className="absolute -top-5 -right-5 w-24 h-24 rounded-full bg-white/10" />
-        <View className="flex-row justify-between items-center mb-4">
-          <Text className={`text-xl font-bold ${textColor}`}>{item.name}</Text>
-          <MaterialIcons name="directions-car" size={24} color="#fff" />
-        </View>
-
-        <View className="mb-2">
-          <Text className={`text-sm font-medium ${textColor}`}>
-            Vehicle No: <Text className="font-bold">{item.vehicleNo}</Text>
+      <View style={cardStyles}>
+        <View style={styles.cardCircle} />
+        <View style={styles.cardHeader}>
+          <Text style={[styles.cardTitle, { color: textColor }]}>
+            {item.name}
           </Text>
-          <Text className={`text-sm font-medium ${textColor}`}>
+          <MaterialIcons name="directions-car" size={24} color={textColor} />
+        </View>
+        <View style={styles.cardInfoGroup}>
+          <Text style={[styles.cardInfoText, { color: textColor }]}>
+            Vehicle No: <Text style={styles.bold}>{item.vehicleNo}</Text>
+          </Text>
+          <Text style={[styles.cardInfoText, { color: textColor }]}>
             Mobile: {item.mobile}
           </Text>
         </View>
-        <View className="flex-row justify-between items-center mt-2">
+        <View style={styles.cardFooter}>
           <View>
-            <Text className={`text-xs ${textColor}`}>Duration</Text>
-            <View className="flex-row items-center">
-              <Text className={`text-base font-semibold ${textColor} mr-2`}>
+            <Text style={[styles.cardLabel, { color: textColor }]}>
+              Duration
+            </Text>
+            <View style={styles.rowCenter}>
+              <Text style={[styles.cardValue, { color: textColor }]}>
                 {item.duration} months
               </Text>
               <TouchableOpacity
@@ -109,31 +102,31 @@ const MonthlyPass: React.FC = () => {
                   setShowDurationModal(true);
                 }}
               >
-                <MaterialIcons
-                  name="edit"
-                  size={18}
-                  color={item.isExpired ? "#000" : "#fff"}
-                />
+                <MaterialIcons name="edit" size={18} color={textColor} />
               </TouchableOpacity>
             </View>
           </View>
-
           <View>
-            <Text className={`text-xs ${textColor}`}>Valid Till</Text>
-            <Text className={`text-base font-semibold ${textColor}`}>
+            <Text style={[styles.cardLabel, { color: textColor }]}>
+              Valid Till
+            </Text>
+            <Text style={[styles.cardValue, { color: textColor }]}>
+              {" "}
               {new Date(item.endDate).toLocaleDateString()}
             </Text>
           </View>
           <View>
-            <Text className={`text-xs ${textColor}`}>Payment</Text>
-            <Text className={`text-base font-semibold ${textColor}`}>
+            <Text style={[styles.cardLabel, { color: textColor }]}>
+              Payment
+            </Text>
+            <Text style={[styles.cardValue, { color: textColor }]}>
               {item.paymentMode}
             </Text>
           </View>
         </View>
-        <View className="mt-4 border-t border-white/30 pt-2 flex-row justify-between">
-          <Text className={`text-xs ${textColor}`}>Pass ID</Text>
-          <Text className={`text-xs font-semibold ${textColor}`}>
+        <View style={styles.passIdSection}>
+          <Text style={[styles.cardLabel, { color: textColor }]}>Pass ID</Text>
+          <Text style={[styles.cardIdValue, { color: textColor }]}>
             #{item._id.slice(-6).toUpperCase()}
           </Text>
         </View>
@@ -149,25 +142,28 @@ const MonthlyPass: React.FC = () => {
         : [];
 
   return (
-    <View className="flex-1 bg-[#F3F4F6]">
-      <View className="my-4 mx-4 bg-white justify-center items-center py-4 rounded-sm shadow-sm">
-        <Text className="text-xl font-semibold">Monthly Pass</Text>
+    <View style={styles.container}>
+      <View style={styles.headerBox}>
+        <Text style={styles.headerTitle}>Monthly Pass</Text>
       </View>
 
-      <View className="flex-row justify-around mx-4 mb-4">
+      <View style={styles.tabsRow}>
         {TABS.map((tab) => (
           <TouchableOpacity
             key={tab}
-            className={`flex-1 py-3 items-center rounded-sm mx-1 ${
-              activeTab === tab ? "bg-green-600" : "bg-white"
-            }`}
+            style={[
+              styles.tabButton,
+              activeTab === tab ? styles.activeTab : styles.inactiveTab,
+            ]}
             disabled={isLoading}
             onPress={() => setActiveTab(tab)}
           >
             <Text
-              className={`text-base font-medium ${
-                activeTab === tab ? "text-white" : "text-black"
-              }`}
+              style={
+                activeTab === tab
+                  ? styles.activeTabText
+                  : styles.inactiveTabText
+              }
             >
               {tab.charAt(0).toUpperCase() + tab.slice(1)}
             </Text>
@@ -177,75 +173,70 @@ const MonthlyPass: React.FC = () => {
 
       {activeTab === "create" ? (
         <TouchableOpacity
-          className="bg-green-600 mx-4 py-4 rounded-sm items-center"
+          style={styles.createButton}
           onPress={() => setModalVisible(true)}
           disabled={isLoading}
         >
-          <Text className="text-white text-base font-medium">
-            Create New Pass
-          </Text>
+          <Text style={styles.createButtonText}>Create New Pass</Text>
         </TouchableOpacity>
       ) : isLoading ? (
-        <ActivityIndicator size="large" color="#22c55e" className="mt-10" />
+        <ActivityIndicator size="large" color="#22c55e" style={styles.loader} />
       ) : (
         <FlatList
           data={data}
           renderItem={renderPassItem}
           keyExtractor={(item) => item._id}
           ListEmptyComponent={
-            <Text className="text-center mt-5 text-base text-gray-500">
-              No {activeTab} passes
-            </Text>
+            <Text style={styles.emptyText}>No {activeTab} passes</Text>
           }
         />
       )}
 
-      {showDurationModal && (
-        <View className="absolute inset-0 bg-black/40 justify-center items-center z-50">
-          <View className="bg-white p-6 rounded-lg w-72 shadow-lg">
-            <Text className="text-lg font-semibold mb-3 text-center">
-              Extend Duration
-            </Text>
-
-            <View className="flex-row flex-wrap justify-center">
+      <Modal visible={showDurationModal} transparent animationType="fade">
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalBox}>
+            <Text style={styles.modalTitle}>Extend Duration</Text>
+            <View style={styles.durationOptions}>
               {[3, 6, 9, 12].map((m) => (
                 <TouchableOpacity
                   key={m}
                   onPress={() => setSelectedMonths(m)}
-                  className={`m-1 px-4 py-2 rounded-full border ${
+                  style={[
+                    styles.durationButton,
                     selectedMonths === m
-                      ? "bg-green-600 border-green-600"
-                      : "bg-gray-200 border-gray-300"
-                  }`}
+                      ? styles.selectedDuration
+                      : styles.unselectedDuration,
+                  ]}
                 >
                   <Text
-                    className={`${
-                      selectedMonths === m ? "text-white" : "text-black"
-                    } font-medium`}
+                    style={
+                      selectedMonths === m
+                        ? styles.selectedDurationText
+                        : styles.unselectedDurationText
+                    }
                   >
                     {m} mo
                   </Text>
                 </TouchableOpacity>
               ))}
             </View>
-
-            <View className="mt-5 flex-row justify-between">
+            <View style={styles.modalActions}>
               <TouchableOpacity
-                className="px-4 py-2 bg-gray-300 rounded"
+                style={styles.cancelButton}
                 onPress={() => setShowDurationModal(false)}
               >
                 <Text>Cancel</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                className="px-4 py-2 bg-green-600 rounded"
+                style={styles.extendButton}
                 onPress={handleExtend}
               >
-                <Text className="text-white font-medium">Extend</Text>
+                <Text style={styles.extendButtonText}>Extend</Text>
               </TouchableOpacity>
             </View>
           </View>
         </View>
-      )}
+      </Modal>
 
       <MonthlyPassModal
         isModalVisible={isModalVisible}
@@ -255,5 +246,150 @@ const MonthlyPass: React.FC = () => {
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: "#F3F4F6" },
+  headerBox: {
+    margin: 16,
+    backgroundColor: "white",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 16,
+    borderRadius: 4,
+    elevation: 2,
+  },
+  headerTitle: { fontSize: 20, fontWeight: "600" },
+  tabsRow: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginHorizontal: 16,
+    marginBottom: 16,
+  },
+  tabButton: {
+    flex: 1,
+    paddingVertical: 12,
+    alignItems: "center",
+    borderRadius: 4,
+    marginHorizontal: 4,
+  },
+  activeTab: { backgroundColor: "#16a34a" },
+  inactiveTab: { backgroundColor: "white" },
+  activeTabText: { color: "white", fontSize: 16, fontWeight: "500" },
+  inactiveTabText: { color: "black", fontSize: 16, fontWeight: "500" },
+  createButton: {
+    backgroundColor: "#16a34a",
+    marginHorizontal: 16,
+    paddingVertical: 16,
+    borderRadius: 4,
+    alignItems: "center",
+  },
+  createButtonText: { color: "white", fontSize: 16, fontWeight: "500" },
+  loader: { marginTop: 40 },
+  emptyText: {
+    textAlign: "center",
+    marginTop: 20,
+    fontSize: 16,
+    color: "gray",
+  },
+  passCard: {
+    marginHorizontal: 16,
+    marginVertical: 12,
+    borderRadius: 8,
+    padding: 20,
+    elevation: 4,
+    position: "relative",
+    overflow: "hidden",
+  },
+  cardCircle: {
+    position: "absolute",
+    top: -20,
+    right: -20,
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    backgroundColor: "rgba(255,255,255,0.1)",
+  },
+  cardHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  cardTitle: { fontSize: 20, fontWeight: "bold" },
+  cardInfoGroup: { marginBottom: 8 },
+  cardInfoText: { fontSize: 14, fontWeight: "500" },
+  bold: { fontWeight: "bold" },
+  cardFooter: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 8,
+  },
+  cardLabel: { fontSize: 12 },
+  cardValue: { fontSize: 16, fontWeight: "600" },
+  passIdSection: {
+    marginTop: 16,
+    borderTopWidth: 1,
+    borderTopColor: "rgba(255,255,255,0.3)",
+    paddingTop: 8,
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  cardIdValue: { fontSize: 12, fontWeight: "600" },
+  rowCenter: { flexDirection: "row", alignItems: "center", gap: 8 },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0,0,0,0.4)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalBox: {
+    backgroundColor: "white",
+    padding: 24,
+    borderRadius: 12,
+    width: 288,
+    elevation: 5,
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    marginBottom: 12,
+    textAlign: "center",
+  },
+  durationOptions: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
+  },
+  durationButton: {
+    margin: 4,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    borderRadius: 24,
+    borderWidth: 1,
+  },
+  selectedDuration: { backgroundColor: "#16a34a", borderColor: "#16a34a" },
+  unselectedDuration: { backgroundColor: "#E5E7EB", borderColor: "#D1D5DB" },
+  selectedDurationText: { color: "white", fontWeight: "500" },
+  unselectedDurationText: { color: "black", fontWeight: "500" },
+  modalActions: {
+    marginTop: 20,
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+  cancelButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    backgroundColor: "#D1D5DB",
+    borderRadius: 4,
+  },
+  extendButton: {
+    paddingHorizontal: 16,
+    paddingVertical: 8,
+    backgroundColor: "#16a34a",
+    borderRadius: 4,
+  },
+  extendButtonText: { color: "white", fontWeight: "500" },
+});
 
 export default MonthlyPass;

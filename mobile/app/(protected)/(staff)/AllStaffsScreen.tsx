@@ -12,6 +12,7 @@ import {
   Platform,
   ToastAndroid,
   Clipboard,
+  StyleSheet,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import Toast from "react-native-toast-message";
@@ -25,13 +26,13 @@ const AllStaffs = () => {
     userAuthStore();
 
   const [isModalVisible, setModalVisible] = useState(false);
-  const [editStaffId, setEditStaffId] = useState<string | null>(null);
+  const [editStaffId, setEditStaffId] = useState(null);
   const [editUsername, setEditUsername] = useState("");
   const [editPassword, setEditPassword] = useState("");
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [buildingName, setBuildingName] = useState("");
   const [buildingLocation, setBuildingLocation] = useState("");
-  const [selectedStaff, setSelectedStaff] = useState<any>(null);
+  const [selectedStaff, setSelectedStaff] = useState(null);
 
   const navigation = useNavigation();
 
@@ -50,7 +51,7 @@ const AllStaffs = () => {
     }
   };
 
-  const handleDelete = (staffId: string) => {
+  const handleDelete = (staffId) => {
     Alert.alert("Delete Staff", "Are you sure?", [
       { text: "Cancel", style: "cancel" },
       {
@@ -77,7 +78,7 @@ const AllStaffs = () => {
     ]);
   };
 
-  const handleEditPress = (staff: any) => {
+  const handleEditPress = (staff) => {
     setEditStaffId(staff._id);
     setEditUsername(staff.username);
     setEditPassword("");
@@ -97,7 +98,7 @@ const AllStaffs = () => {
       return;
     }
 
-    const updates: any = {
+    const updates = {
       username: editUsername,
       building: {
         name: buildingName,
@@ -125,11 +126,11 @@ const AllStaffs = () => {
     }
   };
 
-  const renderItem = ({ item }: any) => (
-    <View className="bg-white p-4 mb-3 rounded-lg shadow">
-      <View className="flex-row justify-between items-center mb-1">
-        <Text className="text-lg font-bold">{item.username}</Text>
-        <View className="flex-row gap-6">
+  const renderItem = ({ item }) => (
+    <View style={styles.card}>
+      <View style={styles.cardHeader}>
+        <Text style={styles.username}>{item.username}</Text>
+        <View style={styles.actionIcons}>
           <TouchableOpacity onPress={() => setSelectedStaff(item)}>
             <Ionicons name="eye-outline" size={22} color="gray" />
           </TouchableOpacity>
@@ -144,39 +145,35 @@ const AllStaffs = () => {
     </View>
   );
 
-  const renderBlurWrapper = (children: React.ReactNode) => {
-    return Platform.OS === "android" ? (
-      <View className="flex-1 justify-center items-center bg-blue-100 bg-opacity-50 px-4">
-        {children}
-      </View>
-    ) : (
-      <BlurView
-        intensity={80}
-        tint="light"
-        className="flex-1 justify-center items-center px-4"
-      >
-        {children}
-      </BlurView>
-    );
-  };
-
   return (
-    <SafeAreaView className="flex-1 bg-gray-100 px-4 mt-6 py-6">
-      <View className="relative h-12 justify-center items-center mb-6">
+    <SafeAreaView style={{ flex: 1, paddingHorizontal: 16, paddingTop: 24 }}>
+      <View
+        style={{
+          marginBottom: 24,
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
+          position: "relative",
+          height: 48,
+        }}
+      >
         <TouchableOpacity
           onPress={() => navigation.goBack()}
-          className="absolute left-0 top-1/2 -translate-y-1/2"
+          style={{ position: "absolute", left: 0 }}
         >
           <Ionicons name="arrow-back" size={28} color="#1F2937" />
         </TouchableOpacity>
-        <Text className="text-2xl font-bold text-gray-800">Staff Details</Text>
+        <Text style={{ fontSize: 24, fontWeight: "bold", color: "#1F2937" }}>
+          Staff Details
+        </Text>
       </View>
 
-      {/* List */}
       {isLoading ? (
         <ActivityIndicator size="large" color="#4F46E5" />
       ) : staffs.length === 0 ? (
-        <Text className="text-center text-gray-500">No staff found</Text>
+        <Text style={{ textAlign: "center", color: "#6B7280" }}>
+          No staff found
+        </Text>
       ) : (
         <FlatList
           data={staffs}
@@ -184,161 +181,37 @@ const AllStaffs = () => {
           renderItem={renderItem}
         />
       )}
-
-      {/* Edit Modal */}
-      <Modal visible={isModalVisible} animationType="slide" transparent={true}>
-        {renderBlurWrapper(
-          <View className="bg-white w-11/12 rounded-xl p-5 shadow-xl">
-            <Text className="text-xl font-bold mb-4 text-center text-green-700">
-              ✏️ Edit Staff Details
-            </Text>
-
-            <TextInput
-              value={editUsername}
-              onChangeText={setEditUsername}
-              placeholder="Username"
-              className="border px-4 py-2 rounded bg-blue-100 text-base mb-3"
-            />
-
-            <View className="relative mb-3">
-              <TextInput
-                value={editPassword}
-                onChangeText={setEditPassword}
-                placeholder="New Password (optional)"
-                secureTextEntry={!passwordVisible}
-                className="border px-4 py-2 rounded bg-blue-100 text-base"
-              />
-              <TouchableOpacity
-                onPress={() => setPasswordVisible(!passwordVisible)}
-                style={{ position: "absolute", right: 10, top: 12 }}
-              >
-                <Ionicons
-                  name={passwordVisible ? "eye-outline" : "eye-off-outline"}
-                  size={20}
-                  color="gray"
-                />
-              </TouchableOpacity>
-            </View>
-
-            <TextInput
-              value={buildingName}
-              onChangeText={setBuildingName}
-              placeholder="Building Name"
-              className="border px-4 py-2 rounded bg-blue-100 text-base mb-3"
-            />
-
-            <TextInput
-              value={buildingLocation}
-              onChangeText={setBuildingLocation}
-              placeholder="Building Location"
-              className="border px-4 py-2 rounded bg-blue-100 text-base mb-4"
-            />
-
-            <View className="flex-row justify-end gap-3">
-              <Pressable
-                onPress={() => setModalVisible(false)}
-                className="px-5 py-2 rounded bg-gray-200"
-              >
-                <Text className="text-gray-800 font-medium">Cancel</Text>
-              </Pressable>
-              <Pressable
-                onPress={handleSaveUpdate}
-                className="px-5 py-2 rounded bg-green-500"
-              >
-                <Text className="text-white font-semibold">Save</Text>
-              </Pressable>
-            </View>
-          </View>
-        )}
-      </Modal>
-
-      {/* View Modal */}
-      <Modal
-        visible={!!selectedStaff}
-        animationType="fade"
-        transparent={true}
-        onRequestClose={() => setSelectedStaff(null)}
-      >
-        {renderBlurWrapper(
-          <View className="bg-white w-full rounded-xl p-6 shadow-xl">
-            <Text className="text-2xl font-bold mb-6 text-center text-indigo-700">
-              👤 Staff Details
-            </Text>
-
-            <View className="space-y-4">
-              <View className="mb-3 border bg-blue-100 rounded-sm px-4 py-2 flex-row items-center gap-3 text-base">
-                <Ionicons
-                  name="person-circle-outline"
-                  size={24}
-                  color="#4B5563"
-                />
-                <View>
-                  <Text className="text-xs text-gray-500 uppercase tracking-wider">
-                    Username
-                  </Text>
-                  <Text className="text-lg text-gray-800 font-semibold">
-                    {selectedStaff?.username}
-                  </Text>
-                </View>
-              </View>
-
-              <View className="border bg-blue-100 rounded-sm px-4 py-2 flex-row items-center justify-between text-base">
-                <View className="flex-row items-center gap-3">
-                  <Ionicons name="key-outline" size={24} color="#4B5563" />
-                  <View>
-                    <Text className="text-xs text-gray-500 uppercase tracking-wider">
-                      Password
-                    </Text>
-                    <Text className="text-lg text-gray-800 font-semibold">
-                      {passwordVisible ? selectedStaff?.password : "••••••••"}
-                    </Text>
-                  </View>
-                </View>
-                <View className="flex-row gap-4">
-                  <TouchableOpacity
-                    onPress={() => setPasswordVisible(!passwordVisible)}
-                  >
-                    <Ionicons
-                      name={passwordVisible ? "eye-outline" : "eye-off-outline"}
-                      size={22}
-                      color="gray"
-                    />
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    onPress={() => {
-                      Clipboard.setString(selectedStaff?.password || "");
-                      Platform.OS === "android"
-                        ? ToastAndroid.show(
-                            "Password copied!",
-                            ToastAndroid.SHORT
-                          )
-                        : Toast.show({
-                            type: "success",
-                            text1: "Password copied!",
-                          });
-                    }}
-                  >
-                    <Ionicons name="copy-outline" size={22} color="gray" />
-                  </TouchableOpacity>
-                </View>
-              </View>
-            </View>
-
-            <Pressable
-              onPress={() => setSelectedStaff(null)}
-              className="mt-8 bg-green-500 px-5 py-3 rounded-sm"
-            >
-              <Text className="text-white text-center text-xl font-semibold">
-                Close
-              </Text>
-            </Pressable>
-          </View>
-        )}
-      </Modal>
-
       <Toast />
     </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  card: {
+    backgroundColor: "#fff",
+    padding: 16,
+    borderRadius: 10,
+    marginBottom: 12,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  cardHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 4,
+  },
+  username: {
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  actionIcons: {
+    flexDirection: "row",
+    gap: 16,
+  },
+});
 
 export default AllStaffs;

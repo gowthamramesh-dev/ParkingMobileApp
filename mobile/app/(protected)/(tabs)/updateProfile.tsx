@@ -8,6 +8,7 @@ import {
   Platform,
   ActivityIndicator,
   Image,
+  StyleSheet,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useRouter } from "expo-router";
@@ -126,10 +127,8 @@ const UpdateProfile = () => {
       setStatus("success");
       Toast.show({ type: "success", text1: "Profile updated successfully" });
 
-      // Scroll to top
       scrollViewRef.current?.scrollTo({ y: 0, animated: true });
 
-      // Clear inputs
       setOldPassword("");
       setNewPassword("");
 
@@ -160,15 +159,15 @@ const UpdateProfile = () => {
 
   if (loading) {
     return (
-      <SafeAreaView className="flex-1 justify-center items-center">
+      <SafeAreaView style={styles.centeredContainer}>
         <ActivityIndicator size="large" color="#4CAF50" />
-        <Text className="mt-3">Loading profile...</Text>
+        <Text style={styles.loadingText}>Loading profile...</Text>
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView className="flex-1 bg-green-100">
+    <SafeAreaView style={styles.safeContainer}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -176,46 +175,37 @@ const UpdateProfile = () => {
       >
         <ScrollView
           ref={scrollViewRef}
-          contentContainerStyle={{
-            padding: 20,
-            paddingBottom: 100,
-            flexGrow: 1,
-          }}
+          contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <View className="items-center mb-6">
-            <Image
-              source={getAvatarImage()}
-              className="w-28 h-28 rounded-full border-4 border-white shadow-md"
-            />
+          <View style={styles.avatarContainer}>
+            <Image source={getAvatarImage()} style={styles.avatarImage} />
           </View>
 
-          <View className="bg-white p-6 rounded-2xl shadow-sm">
-            <Text className="text-2xl font-bold text-center mb-6">
-              Update Profile
-            </Text>
+          <View style={styles.formContainer}>
+            <Text style={styles.title}>Update Profile</Text>
 
-            <Text className="text-lg text-gray-700 mb-2">Username</Text>
+            <Text style={styles.label}>Username</Text>
             <TextInput
               placeholder="Enter new username"
               value={username}
               onChangeText={setUsername}
-              className="border border-blue-100 bg-blue-100 rounded-sm px-4 py-3 text-base mb-4"
+              style={styles.input}
             />
 
-            <Text className="text-lg text-gray-700 mb-2">Old Password</Text>
-            <View className="flex-row items-center border border-gray-300  bg-blue-100 rounded-sm mb-4">
+            <Text style={styles.label}>Old Password</Text>
+            <View style={styles.passwordInput}>
               <TextInput
                 placeholder="Enter current password"
                 secureTextEntry={!showOldPassword}
                 value={oldPassword}
                 onChangeText={setOldPassword}
-                className="flex-1 px-4 py-3 text-base"
+                style={styles.flexInput}
               />
               <TouchableOpacity
                 onPress={() => setShowOldPassword(!showOldPassword)}
-                className="p-2"
+                style={styles.iconBtn}
               >
                 <Ionicons
                   name={showOldPassword ? "eye-off-outline" : "eye-outline"}
@@ -225,18 +215,18 @@ const UpdateProfile = () => {
               </TouchableOpacity>
             </View>
 
-            <Text className="text-lg text-gray-700 mb-2">New Password</Text>
-            <View className="flex-row  items-center border border-gray-300 bg-blue-100 rounded-sm mb-6">
+            <Text style={styles.label}>New Password</Text>
+            <View style={styles.passwordInput}>
               <TextInput
                 placeholder="Enter new password"
                 secureTextEntry={!showNewPassword}
                 value={newPassword}
                 onChangeText={setNewPassword}
-                className="flex-1 px-4 py-3 text-base"
+                style={styles.flexInput}
               />
               <TouchableOpacity
                 onPress={() => setShowNewPassword(!showNewPassword)}
-                className="p-2"
+                style={styles.iconBtn}
               >
                 <Ionicons
                   name={showNewPassword ? "eye-off-outline" : "eye-outline"}
@@ -247,25 +237,122 @@ const UpdateProfile = () => {
             </View>
 
             <TouchableOpacity
-              className={`bg-green-500 py-4 rounded-sm self-center w-36 items-center ${
-                updating ? "opacity-60" : ""
-              }`}
+              style={[
+                styles.updateBtn,
+                updating ? { opacity: 0.6 } : undefined,
+              ]}
               onPress={handleUpdate}
               disabled={updating}
             >
               {updating ? (
                 <ActivityIndicator size="small" color="#000" />
               ) : (
-                <Text className="text-black text-lg font-bold">Update</Text>
+                <Text style={styles.updateBtnText}>Update</Text>
               )}
             </TouchableOpacity>
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-
       <Toast />
     </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  safeContainer: {
+    flex: 1,
+    backgroundColor: "#d1fae5",
+  },
+  centeredContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  loadingText: {
+    marginTop: 12,
+  },
+  scrollContent: {
+    padding: 20,
+    paddingBottom: 100,
+    flexGrow: 1,
+  },
+  avatarContainer: {
+    alignItems: "center",
+    marginBottom: 24,
+  },
+  avatarImage: {
+    width: 112,
+    height: 112,
+    borderRadius: 56,
+    borderWidth: 4,
+    borderColor: "#fff",
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 1 },
+    shadowRadius: 2,
+    elevation: 3,
+  },
+  formContainer: {
+    backgroundColor: "#fff",
+    padding: 24,
+    borderRadius: 16,
+    shadowColor: "#000",
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 24,
+  },
+  label: {
+    fontSize: 18,
+    color: "#374151",
+    marginBottom: 8,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#dbeafe",
+    backgroundColor: "#dbeafe",
+    borderRadius: 4,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 16,
+    marginBottom: 16,
+  },
+  passwordInput: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#d1d5db",
+    backgroundColor: "#dbeafe",
+    borderRadius: 4,
+    marginBottom: 16,
+  },
+  flexInput: {
+    flex: 1,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 16,
+  },
+  iconBtn: {
+    padding: 8,
+  },
+  updateBtn: {
+    backgroundColor: "#22c55e",
+    paddingVertical: 16,
+    borderRadius: 4,
+    alignSelf: "center",
+    width: 144,
+    alignItems: "center",
+  },
+  updateBtnText: {
+    color: "#000",
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+});
 
 export default UpdateProfile;

@@ -4,11 +4,11 @@ import {
   Text,
   TouchableOpacity,
   Alert,
-  ScrollView,
   Image,
   TextInput,
   Modal,
   ActivityIndicator,
+  StyleSheet,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
@@ -180,9 +180,9 @@ const Profile = () => {
 
   if (!parsedUser || parsedUser.role !== "admin") {
     return (
-      <View className="flex-1 items-center justify-center bg-white px-4">
-        <Text className="text-red-500 text-xl font-bold">Access Denied</Text>
-        <Text className="text-gray-600 mt-2 text-center">
+      <View style={styles.centeredViewWhite}>
+        <Text style={styles.accessDeniedText}>Access Denied</Text>
+        <Text style={styles.subText}>
           You are not authorized to view this page.
         </Text>
       </View>
@@ -190,80 +190,56 @@ const Profile = () => {
   }
 
   return (
-    <View className="flex-1 bg-[#F3F4F6]">
-      <View className="m-4 gap-3">
-        <View className="bg-white py-4 rounded-sm shadow-sm">
-          <View className="flex-row items-center justify-between px-4">
-            {/* Back Button */}
+    <View style={styles.container}>
+      <View style={styles.innerContainer}>
+        <View style={styles.headerCard}>
+          <View style={styles.headerRow}>
             <TouchableOpacity onPress={() => router.back()}>
               <Ionicons name="arrow-back" size={24} color="black" />
             </TouchableOpacity>
-
-            {/* Title */}
-            <Text className="text-xl font-semibold text-center flex-1">
-              Profile Settings
-            </Text>
-
-            {/* Spacer to balance layout */}
+            <Text style={styles.headerTitle}>Profile Settings</Text>
             <View style={{ width: 24 }} />
           </View>
         </View>
 
-        <View className="">
-          <View className="items-center py-2 mb-2">
-            <TouchableOpacity onPress={pickImage} className="items-center">
+        <View>
+          <View style={styles.avatarContainer}>
+            <TouchableOpacity onPress={pickImage} style={styles.centeredItems}>
               {avatar ? (
-                <Image
-                  source={{ uri: avatar }}
-                  className="w-32 h-32 rounded-full border-4 border-white shadow-lg"
-                />
+                <Image source={{ uri: avatar }} style={styles.avatarImage} />
               ) : (
-                <View className="w-32 h-32 rounded-full bg-green-400 border-4 border-white shadow-lg items-center justify-center">
-                  <Text className="text-4xl font-bold text-white">
-                    {initial}
-                  </Text>
+                <View style={styles.avatarFallback}>
+                  <Text style={styles.avatarInitial}>{initial}</Text>
                 </View>
               )}
-              <Text className="text-sm text-gray-500 mt-2">
-                Click to upload a new photo
-              </Text>
+              <Text style={styles.uploadText}>Click to upload a new photo</Text>
             </TouchableOpacity>
           </View>
-          {/* User Info */}
-          <View className="bg-white p-6 rounded-sm shadow-lg">
-            <View className="mb-6">
-              <Text className="text-sm font-medium text-gray-700 mb-1">
-                Username
-              </Text>
-              <View className="rounded-sm px-4 bg-blue-100 h-14 py-4">
-                <Text className="text-gray-900 text-base">
-                  {parsedUser?.username}
-                </Text>
+
+          <View style={styles.card}>
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Username</Text>
+              <View style={styles.inputBox}>
+                <Text style={styles.inputText}>{parsedUser?.username}</Text>
               </View>
             </View>
-            <View className="mb-6">
-              <Text className="text-sm font-medium text-gray-700 mb-1">
-                Email
-              </Text>
-              <View className="rounded-sm px-4 bg-blue-100 h-14 py-4">
-                <Text className="text-gray-900 text-base">
-                  {parsedUser?.email}
-                </Text>
+
+            <View style={styles.inputGroup}>
+              <Text style={styles.label}>Email</Text>
+              <View style={styles.inputBox}>
+                <Text style={styles.inputText}>{parsedUser?.email}</Text>
               </View>
             </View>
+
             <TouchableOpacity
               onPress={() => setShowModal(true)}
-              className="bg-green-500 py-3 rounded-sm items-center self-center w-full mb-4"
+              style={styles.editBtn}
             >
-              <Text className="text-black text-lg font-medium">
-                Edit Profile
-              </Text>
+              <Text style={styles.editBtnText}>Edit Profile</Text>
             </TouchableOpacity>
-            <TouchableOpacity
-              onPress={handleLogout}
-              className="bg-red-500 py-3 rounded-sm self-center w-full items-center"
-            >
-              <Text className="text-black text-lg font-semibold">Logout</Text>
+
+            <TouchableOpacity onPress={handleLogout} style={styles.logoutBtn}>
+              <Text style={styles.logoutBtnText}>Logout</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -271,58 +247,50 @@ const Profile = () => {
 
       {showModal && (
         <Modal visible={showModal} animationType="fade" transparent>
-          <View className="flex-1 justify-center items-center bg-black/50">
-            <View className="bg-white p-5 gap-3 rounded-sm w-4/5">
-              <Text className="text-lg font-semibold mb-4 text-center">
-                Update Profile
-              </Text>
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalBox}>
+              <Text style={styles.modalTitle}>Update Profile</Text>
 
               <TextInput
                 value={username}
                 onChangeText={setUsername}
-                className="border border-gray-200 bg-blue-100 rounded-sm p-3 text-base"
+                style={styles.modalInput}
                 placeholder="Enter new username"
               />
-
               <TextInput
                 value={oldPassword}
                 onChangeText={setOldPassword}
                 secureTextEntry
-                className="border border-gray-200 bg-blue-100 rounded-sm p-3 text-base"
+                style={styles.modalInput}
                 placeholder="Enter old password"
               />
-
               <TextInput
                 value={newPassword}
                 onChangeText={setNewPassword}
                 secureTextEntry
-                className="border border-gray-200 bg-blue-100 rounded-sm p-3 text-base"
+                style={styles.modalInput}
                 placeholder="Enter new password"
               />
 
-              <View className="flex-row justify-between mt-4">
+              <View style={styles.modalActions}>
                 <TouchableOpacity
-                  className="bg-red-500 py-3 px-4 rounded-sm flex-1 mr-2"
+                  style={styles.cancelBtn}
                   onPress={() => setShowModal(false)}
                 >
-                  <Text className="text-white text-base font-medium text-center">
-                    Cancel
-                  </Text>
+                  <Text style={styles.cancelText}>Cancel</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  className={`bg-green-600 py-3 px-4 justify-center items-center rounded-sm flex-1 ml-2 ${updating && "opacity-60"}`}
+                  style={[styles.updateBtn, updating && styles.disabledBtn]}
                   disabled={updating}
                   onPress={handleUpdate}
                 >
                   {updating ? (
-                    <View className="bg-white p-2 rounded-full">
+                    <View style={styles.loadingIndicator}>
                       <ActivityIndicator size="small" color="#10B981" />
                     </View>
                   ) : (
-                    <Text className="text-center text-xl text-white font-semibold">
-                      Update
-                    </Text>
+                    <Text style={styles.updateText}>Update</Text>
                   )}
                 </TouchableOpacity>
               </View>
@@ -335,5 +303,164 @@ const Profile = () => {
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: "#F3F4F6" },
+  innerContainer: { margin: 16, gap: 12 },
+  headerCard: {
+    backgroundColor: "white",
+    paddingVertical: 16,
+    borderRadius: 4,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+  },
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 16,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: "600",
+    textAlign: "center",
+    flex: 1,
+  },
+  avatarContainer: {
+    alignItems: "center",
+    paddingVertical: 8,
+    marginBottom: 8,
+  },
+  centeredItems: { alignItems: "center" },
+  avatarImage: {
+    width: 128,
+    height: 128,
+    borderRadius: 64,
+    borderWidth: 4,
+    borderColor: "white",
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+  },
+  avatarFallback: {
+    width: 128,
+    height: 128,
+    borderRadius: 64,
+    backgroundColor: "#34D399",
+    borderWidth: 4,
+    borderColor: "white",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  avatarInitial: { fontSize: 32, fontWeight: "bold", color: "white" },
+  uploadText: { fontSize: 12, color: "#6B7280", marginTop: 4 },
+  card: {
+    backgroundColor: "white",
+    padding: 24,
+    borderRadius: 4,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+  },
+  inputGroup: { marginBottom: 24 },
+  label: { fontSize: 12, fontWeight: "500", color: "#374151", marginBottom: 4 },
+  inputBox: {
+    backgroundColor: "#DBEAFE",
+    height: 56,
+    justifyContent: "center",
+    paddingHorizontal: 16,
+    borderRadius: 4,
+  },
+  inputText: { fontSize: 16, color: "#111827" },
+  editBtn: {
+    backgroundColor: "#10B981",
+    paddingVertical: 12,
+    borderRadius: 4,
+    alignItems: "center",
+    marginBottom: 16,
+  },
+  editBtnText: { color: "black", fontSize: 16, fontWeight: "500" },
+  logoutBtn: {
+    backgroundColor: "#EF4444",
+    paddingVertical: 12,
+    borderRadius: 4,
+    alignItems: "center",
+  },
+  logoutBtnText: { color: "black", fontSize: 16, fontWeight: "600" },
+  centeredViewWhite: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "white",
+    paddingHorizontal: 16,
+  },
+  accessDeniedText: { color: "#EF4444", fontSize: 20, fontWeight: "bold" },
+  subText: {
+    color: "#6B7280",
+    fontSize: 14,
+    marginTop: 8,
+    textAlign: "center",
+  },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.5)",
+  },
+  modalBox: {
+    backgroundColor: "white",
+    padding: 20,
+    gap: 12,
+    borderRadius: 4,
+    width: "80%",
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    textAlign: "center",
+    marginBottom: 8,
+  },
+  modalInput: {
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    backgroundColor: "#DBEAFE",
+    borderRadius: 4,
+    padding: 12,
+    fontSize: 16,
+  },
+  modalActions: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 16,
+  },
+  cancelBtn: {
+    backgroundColor: "#EF4444",
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 4,
+    flex: 1,
+    marginRight: 8,
+  },
+  cancelText: {
+    color: "white",
+    fontSize: 14,
+    fontWeight: "500",
+    textAlign: "center",
+  },
+  updateBtn: {
+    backgroundColor: "#059669",
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 4,
+    flex: 1,
+    marginLeft: 8,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  disabledBtn: { opacity: 0.6 },
+  loadingIndicator: { backgroundColor: "white", padding: 8, borderRadius: 100 },
+  updateText: { color: "white", fontSize: 18, fontWeight: "600" },
+});
 
 export default Profile;

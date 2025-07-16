@@ -1,6 +1,6 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Tabs, Link, Redirect } from "expo-router";
-import { View, Text, TouchableOpacity } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import userAuthStore from "@/utils/store";
 import React from "react";
@@ -16,13 +16,13 @@ function TopBar() {
   };
 
   return (
-    <View className="flex-row items-center justify-between">
-      <View className="bg-white flex-1 flex-row items-center justify-between my-5 p-2.5 rounded-sm">
-        <View className="flex-row items-center justify-center gap-2">
+    <View style={styles.topBarWrapper}>
+      <View style={styles.topBarContainer}>
+        <View style={styles.titleWrapper}>
           <Link href="/profile">
             <Ionicons name="person-circle-outline" size={40} />
           </Link>
-          <Text className="text-xl font-extrabold">Parking App</Text>
+          <Text style={styles.titleText}>Parking App</Text>
         </View>
         <TouchableOpacity onPress={handleLogout}>
           <Ionicons name="log-out-outline" size={20} />
@@ -34,8 +34,8 @@ function TopBar() {
 
 export default function TabLayout() {
   return (
-    <SafeAreaView className="bg-[#3CDF70]" style={{ flex: 1 }}>
-      <View className="px-4">
+    <SafeAreaView style={styles.container}>
+      <View style={styles.innerContainer}>
         <TopBar />
       </View>
 
@@ -48,7 +48,6 @@ export default function TabLayout() {
           },
         }}
       >
-        {/* Only include screens from (tabs) */}
         <Tabs.Screen
           name="index"
           options={{
@@ -86,13 +85,7 @@ export default function TabLayout() {
           }}
         />
         <Tabs.Screen name="adminProfile" options={{ href: null }} />
-        <Tabs.Screen
-          name="dashboard"
-          options={{
-            href: null,
-          }}
-        />
-
+        <Tabs.Screen name="dashboard" options={{ href: null }} />
         <Tabs.Screen name="profile" options={{ href: null }} />
         <Tabs.Screen name="staffs" options={{ href: null }} />
         <Tabs.Screen name="updateProfile" options={{ href: null }} />
@@ -102,3 +95,38 @@ export default function TabLayout() {
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: "#3CDF70",
+    flex: 1,
+  },
+  innerContainer: {
+    paddingHorizontal: 16,
+  },
+  topBarWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  topBarContainer: {
+    backgroundColor: "white",
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginVertical: 20,
+    padding: 10,
+    borderRadius: 4,
+  },
+  titleWrapper: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+  },
+  titleText: {
+    fontSize: 20,
+    fontWeight: "800",
+  },
+});
