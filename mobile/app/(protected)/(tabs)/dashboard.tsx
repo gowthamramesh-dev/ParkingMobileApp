@@ -5,12 +5,15 @@ import {
   ScrollView,
   FlatList,
   RefreshControl,
+  TouchableOpacity,
 } from "react-native";
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { ProgressChart, PieChart } from "react-native-chart-kit";
 import userAuthStore from "@/utils/store";
 import { LinearGradient } from "expo-linear-gradient";
 import Animated, { FadeInDown } from "react-native-reanimated";
+import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
 
 const screenWidth = Dimensions.get("window").width;
 const chartWidth = screenWidth * 0.95;
@@ -202,12 +205,23 @@ const TodayReport = () => {
     <LinearGradient colors={["#f3f4f6", "#e5e7eb"]} className="flex-1">
       <Animated.View
         entering={FadeInDown.duration(300)}
-        className="my-4 mx-4 bg-white rounded-xl justify-center items-center py-5 shadow-md shadow-gray-200/50"
+        className="my-4 mx-4 bg-white py-4 rounded-sm shadow-sm"
       >
-        <Text className="text-2xl font-extrabold text-gray-900">
-          Admin Dashboard
-        </Text>
+        <View className="flex-row items-center justify-between px-2">
+          {/* Back Button */}
+          <TouchableOpacity onPress={() => router.back()}>
+            <Ionicons name="arrow-back" size={24} color="black" />
+          </TouchableOpacity>
+          {/* Title */}
+          <Text
+            style={{ width: 24 }}
+            className="text-xl font-semibold text-center flex-1"
+          >
+            Admin Dashboard
+          </Text>
+        </View>
       </Animated.View>
+
       <ScrollView
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />

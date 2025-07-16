@@ -37,7 +37,6 @@ const CreateStaff = () => {
     }
 
     const building = { name: buildingName, location: buildingLocation };
-
     const result = await createStaff(username, password, building);
 
     if (result.success) {
@@ -68,14 +67,19 @@ const CreateStaff = () => {
       <ScrollView contentContainerStyle={{ paddingBottom: 30 }}>
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : undefined}
-          className="flex-1 px-5 pt-10"
+          className="flex-1 px-5 pt-6"
         >
           {/* 🔙 Header */}
-          <View className="flex-row items-center mb-8">
-            <TouchableOpacity onPress={() => navigation.goBack()} className="mr-2">
+          <View className="relative mb-8 items-center justify-center h-12">
+            <TouchableOpacity
+              onPress={() => navigation.goBack()}
+              className="absolute left-0 top-1/2 -translate-y-1/2"
+            >
               <Ionicons name="arrow-back" size={28} color="#1F2937" />
             </TouchableOpacity>
-            <Text className="text-2xl font-bold text-gray-800">Create Staff</Text>
+            <Text className="text-2xl font-bold text-gray-800">
+              Create Staff
+            </Text>
           </View>
 
           {/* 👤 Username */}
@@ -95,7 +99,7 @@ const CreateStaff = () => {
               onChangeText={setPassword}
               placeholder="Enter password"
               secureTextEntry={!showPassword}
-              className="flex-1 text-base"
+              className="flex-1 text-base py-3"
             />
             <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
               <Ionicons

@@ -15,6 +15,7 @@ import { useRouter } from "expo-router";
 import Toast from "react-native-toast-message";
 import userAuthStore from "../../../utils/store";
 import ToastManager from "toastify-react-native/components/ToastManager";
+import { Ionicons } from "@expo/vector-icons";
 
 const Profile = () => {
   const { user, logOut, updateProfile } = userAuthStore();
@@ -191,9 +192,23 @@ const Profile = () => {
   return (
     <View className="flex-1 bg-[#F3F4F6]">
       <View className="m-4 gap-3">
-        <View className=" bg-white justify-center items-center py-4 rounded-sm shadow-sm">
-          <Text className="text-xl font-semibold">Profile Settings</Text>
+        <View className="bg-white py-4 rounded-sm shadow-sm">
+          <View className="flex-row items-center justify-between px-4">
+            {/* Back Button */}
+            <TouchableOpacity onPress={() => router.back()}>
+              <Ionicons name="arrow-back" size={24} color="black" />
+            </TouchableOpacity>
+
+            {/* Title */}
+            <Text className="text-xl font-semibold text-center flex-1">
+              Profile Settings
+            </Text>
+
+            {/* Spacer to balance layout */}
+            <View style={{ width: 24 }} />
+          </View>
         </View>
+
         <View className="">
           <View className="items-center py-2 mb-2">
             <TouchableOpacity onPress={pickImage} className="items-center">

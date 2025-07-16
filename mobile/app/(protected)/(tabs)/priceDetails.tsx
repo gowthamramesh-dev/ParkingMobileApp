@@ -12,6 +12,8 @@ import { useNavigation } from "@react-navigation/native";
 import Toast from "react-native-toast-message";
 import userAuthStore from "@/utils/store"; // adjust path to your store
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { router } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 
 type VehicleType = "cycle" | "bike" | "car" | "van" | "lorry" | "bus";
 
@@ -157,8 +159,20 @@ const PriceDetails = () => {
       className="bg-[#F3F4F6] py-4 flex-1 px-4"
     >
       <View className="gap-5">
-        <View className=" bg-white justify-center items-center py-4 rounded-sm shadow-sm">
-          <Text className="text-xl font-semibold">Manage Price List</Text>
+        <View className="bg-white py-4 px-4 rounded-sm shadow-sm">
+          <View className="flex-row items-center justify-between">
+            {/* Back Button */}
+            <TouchableOpacity onPress={() => router.back()}>
+              <Ionicons name="arrow-back" size={24} color="black" />
+            </TouchableOpacity>
+
+            {/* Title Centered */}
+            <Text className="text-xl font-semibold text-center flex-1">
+              Manage Price List
+            </Text>
+
+            <Ionicons name="arrow-back" size={24} color="transparent" />
+          </View>
         </View>
 
         <ScrollView className="">

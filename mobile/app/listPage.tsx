@@ -43,7 +43,7 @@ const Index = () => {
         translucent
         barStyle="dark-content"
       />
-      <View className="bg-green-100 py-4 flex-1 px-4">
+      <View className="bg-[#F3F4F6] py-4 flex-1 px-4">
         {/* Tabs */}
         <View className="border border-white shadow-md rounded-sm bg-white p-2 mb-4">
           <View className="flex-row justify-around gap-2">
@@ -69,9 +69,7 @@ const Index = () => {
 
         {/* Content */}
         <View className="flex-1">
-          <ScrollView showsVerticalScrollIndicator={false}>
-            {renderTabContent()}
-          </ScrollView>
+          <ScrollView>{renderTabContent()}</ScrollView>
         </View>
       </View>
     </>
