@@ -1,6 +1,3 @@
-// index.js
-// import "./cron/sendExpiryReminders.js"
-
 import express from "express";
 import APIRouter from "./routes/APIRouter.js";
 import mongoose from "mongoose";
@@ -16,7 +13,6 @@ const app = express();
 app.use(cors());
 app.use(morgan("tiny"));
 app.use(express.json());
-
 app.use(express.urlencoded({ extended: false }));
 
 // Routes
@@ -26,7 +22,7 @@ const PORT = process.env.PORT || 5000;
 // Database Connection
 const ConnectDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGODB_URI);
+    await mongoose.connect(process.env.MONGO_URI);
     console.log("DB Connected Successfully");
   } catch (error) {
     console.log("Error connecting to database");
@@ -34,7 +30,10 @@ const ConnectDB = async () => {
     process.exit(1);
   }
 };
+
 ConnectDB();
 app.listen(PORT, () => {
   console.log("Server is Running on Port", PORT);
 });
+
+console.log("MONGO_URI from env:", process.env.MONGO_URI); // ✅ Correct key
