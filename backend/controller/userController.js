@@ -560,6 +560,7 @@ const getDashboardData = async (req, res) => {
     const transactionLogs = [
       ...checkinLogs.map((log) => ({
         id: log._id.toString(),
+        uname: log.name || "",
         type: "checkin",
         vehicleType: log.vehicleType,
         timestamp: log.entryDateTime,
@@ -569,6 +570,7 @@ const getDashboardData = async (req, res) => {
       })),
       ...checkoutLogs.map((log) => ({
         id: log._id.toString(),
+        uname: log.name || "",
         type: "checkout",
         vehicleType: log.vehicleType,
         timestamp: log.CheckOutTime,
