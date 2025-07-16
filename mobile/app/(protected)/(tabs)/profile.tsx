@@ -22,11 +22,38 @@ const AccountSettings = () => {
 
   return (
     <View className="flex-1 bg-[#F3F4F6]">
-      <View className=" my-4 mx-4 bg-white justify-center items-center py-4 rounded-sm shadow-sm">
-        <Text className="text-xl font-semibold">Account Settings</Text>
+      <View className="my-4 mx-4 bg-white py-4 rounded-sm shadow-sm">
+        <View className="flex-row items-center justify-between">
+          {/* Back Button */}
+          <TouchableOpacity onPress={() => router.back()}>
+            <Ionicons name="arrow-back" size={24} color="black" />
+          </TouchableOpacity>
+          {/* Center Title */}
+          <Text className="text-xl font-semibold text-center flex-1">
+            Account Settings
+          </Text>
+          {/* Spacer to balance layout */}
+          <View style={{ width: 24 }} />
+          <View style={{ width: 24 }}>
+            <Text> </Text>
+          </View>
+          {/* Same width as the icon for spacing */}
+        </View>
       </View>
 
       <View className=" my-4 mx-4">
+        <TouchableOpacity
+          className="flex-row items-center justify-between bg-green-50 px-5 py-4 rounded-md shadow mb-4"
+          onPress={() => router.push("/dashboard")}
+        >
+          <View className="flex-row items-center justify-center">
+            <Ionicons name="stats-chart-outline" size={30} color="#2d6a4f" />
+            <Text className="ml-3 text-xl font-semibold text-green-800">
+              Dashboard
+            </Text>
+          </View>
+          <Ionicons name="chevron-forward-outline" size={25} color="#2d6a4f" />
+        </TouchableOpacity>
         <TouchableOpacity
           className="flex-row items-center justify-between bg-green-50 px-5 py-4 rounded-md shadow mb-4"
           onPress={() => router.push("/adminProfile")}

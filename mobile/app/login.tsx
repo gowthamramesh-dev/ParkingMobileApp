@@ -9,7 +9,6 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
-  Alert,
   TouchableWithoutFeedback,
   Keyboard,
   ActivityIndicator,

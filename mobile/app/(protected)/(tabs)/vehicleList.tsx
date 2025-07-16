@@ -180,11 +180,11 @@ const VehicleList = () => {
       </View>
 
       <View className="flex-row items-center gap-2">
-        <View className="flex-1 h-12 rounded-sm border border-gray-200 bg-white">
+        <View className="flex-1 h-15 rounded-sm border border-gray-200 bg-white">
           <Picker
             selectedValue={checkType}
             onValueChange={setCheckType}
-            style={{ height: 48, backgroundColor: "transparent" }}
+            style={{ height: 50, backgroundColor: "transparent" }}
           >
             <Picker.Item label="Check In" value="checkins" />
             <Picker.Item label="Check Out" value="checkouts" />

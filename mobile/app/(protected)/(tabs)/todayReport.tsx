@@ -139,8 +139,8 @@ const TodayReport = () => {
         entering={FadeInDown.duration(300)}
         className="my-4 mx-4 bg-white rounded-xl justify-center items-center py-5 shadow-md shadow-gray-200/50"
       >
-        <Text className="text-2xl font-extrabold text-gray-900">
-          Today's Report
+        <Text className="text-2xl font-bold text-gray-900">
+          Today&apos;s Report
         </Text>
       </Animated.View>
       <ScrollView
