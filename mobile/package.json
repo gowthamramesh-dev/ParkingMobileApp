@@ -73,6 +73,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
+    "@types/jwt-decode": "^2.2.1",
     "@types/react": "~19.0.10",
     "@types/react-native-svg-charts": "^5.0.16",
     "@types/react-native-vector-icons": "^6.4.18",
