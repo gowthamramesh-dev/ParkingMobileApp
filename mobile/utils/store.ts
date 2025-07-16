@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
+import { jwtDecode } from "jwt-decode";
 
 const URL = "https://parking-servers.onrender.com/";
 
@@ -237,7 +238,7 @@ const userAuthStore = create<UserAuthState>((set, get) => ({
       const user = await AsyncStorage.getItem("user");
 
       if (token && user) {
-        const decoded = JSON.parse(atob(token.split(".")[1]));
+        const decoded = jwtDecode(token);
         const exp = decoded?.exp;
 
         if (exp && exp * 1000 > Date.now()) {
