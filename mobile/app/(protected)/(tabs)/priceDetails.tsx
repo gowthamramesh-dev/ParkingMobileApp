@@ -154,95 +154,90 @@ const PriceDetails = () => {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : undefined}
-      className="flex-1 bg-green-100"
+      className="bg-[#F3F4F6] py-4 flex-1 px-4"
     >
-      <ScrollView className="p-4">
-        <Text className="text-3xl font-extrabold mb-6 text-green-800 text-center">
-          Manage Price List
-        </Text>
-
-        {/* Tabs */}
-        <View className="flex-row justify-around mb-6">
-          <TouchableOpacity
-            className={`flex-1 p-3 rounded-l-full ${
-              activeTab === "daily" ? "bg-green-600" : "bg-white"
-            }`}
-            onPress={() => setActiveTab("daily")}
-          >
-            <Text
-              className={`text-center text-lg font-bold ${
-                activeTab === "daily" ? "text-white" : "text-green-800"
-              }`}
-            >
-              Daily Prices
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            className={`flex-1 p-3 rounded-r-full ${
-              activeTab === "monthly" ? "bg-green-600" : "bg-white"
-            }`}
-            onPress={() => setActiveTab("monthly")}
-          >
-            <Text
-              className={`text-center text-lg font-bold ${
-                activeTab === "monthly" ? "text-white" : "text-green-800"
-              }`}
-            >
-              Monthly Prices
-            </Text>
-          </TouchableOpacity>
+      <View className="gap-5">
+        <View className=" bg-white justify-center items-center py-4 rounded-sm shadow-sm">
+          <Text className="text-xl font-semibold">Manage Price List</Text>
         </View>
 
-        {/* Input Section */}
-        <View className="bg-white shadow rounded-xl px-4 py-4 mb-6">
-          {vehicleTypes.map((type) => (
-            <View key={type} className="mb-4">
-              <Text className="text-base font-semibold text-gray-800 capitalize mb-1">
-                {type}
+        <ScrollView className="">
+          <View className="flex-row shadow-md justify-around mb-6">
+            <TouchableOpacity
+              className={`flex-1 p-3 rounded-l-md ${
+                activeTab === "daily" ? "bg-green-600" : "bg-white"
+              }`}
+              onPress={() => setActiveTab("daily")}
+            >
+              <Text
+                className={`text-center text-lg font-bold ${
+                  activeTab === "daily" ? "text-white" : "text-green-800"
+                }`}
+              >
+                Daily Prices
               </Text>
-              <TextInput
-                value={
-                  activeTab === "daily" ? dailyForm[type] : monthlyForm[type]
-                }
-                onChangeText={(val) =>
-                  handleChange(type, val, activeTab)
-                }
-                placeholder={`Enter ${type} ${activeTab} price`}
-                keyboardType="numeric"
-                className="border border-gray-300 rounded px-4 py-2 bg-blue-100"
-              />
-            </View>
-          ))}
-        </View>
-
-        {/* Buttons */}
-        <View className="flex-row justify-between gap-4 mb-4">
-          <TouchableOpacity
-            className={`flex-1 bg-green-600 py-4 rounded-sm ${
-              !isFormValid(activeTab) ? "opacity-50" : ""
-            }`}
-            onPress={handleAdd}
-            disabled={!isFormValid(activeTab)}
-          >
-            <Text className="text-center text-white font-semibold text-lg">
-              Add Price
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            className={`flex-1 bg-green-500 py-4 rounded-sm ${
-              !isFormValid(activeTab) ? "opacity-50" : ""
-            }`}
-            onPress={handleUpdate}
-            disabled={!isFormValid(activeTab)}
-          >
-            <Text className="text-center text-white font-semibold text-lg">
-              Update Price
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
+            </TouchableOpacity>
+            <TouchableOpacity
+              className={`flex-1 p-3 rounded-r-md ${
+                activeTab === "monthly" ? "bg-green-600" : "bg-white"
+              }`}
+              onPress={() => setActiveTab("monthly")}
+            >
+              <Text
+                className={`text-center text-lg font-bold ${
+                  activeTab === "monthly" ? "text-white" : "text-green-800"
+                }`}
+              >
+                Monthly Prices
+              </Text>
+            </TouchableOpacity>
+          </View>
+          {/* Input Section */}
+          <View className="bg-white shadow rounded-lg px-4 py-4 mb-6">
+            {vehicleTypes.map((type) => (
+              <View key={type} className="mb-4">
+                <Text className="text-base font-semibold text-gray-800 capitalize mb-1">
+                  {type}
+                </Text>
+                <TextInput
+                  value={
+                    activeTab === "daily" ? dailyForm[type] : monthlyForm[type]
+                  }
+                  onChangeText={(val) => handleChange(type, val, activeTab)}
+                  placeholder={`Enter ${type} ${activeTab} price`}
+                  keyboardType="numeric"
+                  className="border border-gray-300 rounded px-4 py-2 bg-blue-100"
+                />
+              </View>
+            ))}
+          </View>
+          {/* Buttons */}
+          <View className="flex-row justify-between gap-4 mb-4">
+            <TouchableOpacity
+              className={`flex-1 bg-green-600 py-4 rounded-sm ${
+                !isFormValid(activeTab) ? "opacity-50" : ""
+              }`}
+              onPress={handleAdd}
+              disabled={!isFormValid(activeTab)}
+            >
+              <Text className="text-center text-white font-semibold text-lg">
+                Add Price
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              className={`flex-1 bg-green-500 py-4 rounded-sm ${
+                !isFormValid(activeTab) ? "opacity-50" : ""
+              }`}
+              onPress={handleUpdate}
+              disabled={!isFormValid(activeTab)}
+            >
+              <Text className="text-center text-white font-semibold text-lg">
+                Update Price
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </View>
 
       <Toast />
     </KeyboardAvoidingView>
