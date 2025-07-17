@@ -6,6 +6,7 @@ import {
   FlatList,
   RefreshControl,
   TouchableOpacity,
+  StyleSheet,
 } from "react-native";
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { ProgressChart, PieChart } from "react-native-chart-kit";
@@ -30,6 +31,110 @@ const chartConfig = {
   },
 };
 
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#f3f4f6",
+  },
+  header: {
+    marginVertical: 16,
+    marginHorizontal: 16,
+    backgroundColor: "#ffffff",
+    padding: 16,
+    borderRadius: 2,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 1,
+    elevation: 1,
+  },
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingHorizontal: 8,
+  },
+  title: {
+    width: 24,
+    fontSize: 20,
+    fontWeight: "600",
+    textAlign: "center",
+    flex: 1,
+    color: "#1f2937",
+  },
+  chartSection: {
+    width: screenWidth,
+    alignItems: "center",
+    paddingVertical: 12,
+  },
+  chartTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#374151",
+    marginBottom: 16,
+  },
+  chartContainer: {
+    borderRadius: 12,
+    padding: 16,
+    shadowColor: "rgba(0, 200, 83, 0.5)",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.5,
+    shadowRadius: 6,
+    elevation: 4,
+  },
+  tableContainer: {
+    backgroundColor: "#ffffff",
+    marginHorizontal: 16,
+    borderRadius: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+    marginBottom: 16,
+  },
+  tableHeader: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    backgroundColor: "#d1fae5",
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#e5e7eb",
+    marginHorizontal: 8,
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
+  },
+  tableHeaderText: {
+    fontWeight: "800",
+    color: "#374151",
+    textAlign: "center",
+  },
+  tableRow: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#f3f4f6",
+    marginHorizontal: 8,
+  },
+  tableRowText: {
+    color: "#374151",
+    fontWeight: "500",
+    textAlign: "center",
+  },
+  tableRowMoney: {
+    color: "#22c55e",
+    fontWeight: "500",
+    textAlign: "center",
+  },
+  noData: {
+    textAlign: "center",
+    padding: 16,
+    color: "#6b7280",
+    fontWeight: "500",
+  },
+});
+
 const prepareChartData = (dataObject: any) => {
   const types = Object.keys(dataObject || {});
   const counts = Object.values(dataObject || {}) as number[];
@@ -48,16 +153,18 @@ const prepareChartData = (dataObject: any) => {
 const ChartSection = ({ title, data }: any) => (
   <Animated.View
     entering={FadeInDown.duration(500)}
-    style={{
-      width: screenWidth,
-      alignItems: "center",
-      paddingVertical: 12,
-    }}
+    style={styles.chartSection}
   >
-    <Text className="text-xl font-bold text-gray-800 mb-4">{title}</Text>
-    <LinearGradient
-      colors={["#f0fdf4", "#dcfce7"]}
-      className="rounded-xl p-4 shadow-lg shadow-green-200/50"
+    <Text style={styles.chartTitle}>{title}</Text>
+    <View
+      style={[
+        styles.chartContainer,
+        {
+          backgroundColor: "#f0fdf4",
+          backgroundGradient: LinearGradient,
+          gradientColors: ["#f0fdf4", "#dcfce7"],
+        },
+      ]}
     >
       <ProgressChart
         data={prepareChartData(data)}
@@ -68,31 +175,33 @@ const ChartSection = ({ title, data }: any) => (
         chartConfig={chartConfig}
         hideLegend={false}
       />
-    </LinearGradient>
+    </View>
   </Animated.View>
 );
 
 const PieChartSection = ({ title, data }: { title: string; data: any[] }) => {
   if (!data || data.length === 0) {
     return (
-      <View className="flex-1 justify-center items-center">
-        <Text className="text-gray-500">No data available</Text>
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+        <Text style={{ color: "#6b7280" }}>No data available</Text>
       </View>
     );
   }
   return (
     <Animated.View
       entering={FadeInDown.duration(500)}
-      style={{
-        width: screenWidth,
-        alignItems: "center",
-        paddingVertical: 12,
-      }}
+      style={styles.chartSection}
     >
-      <Text className="text-xl font-bold text-gray-800 mb-4">{title}</Text>
-      <LinearGradient
-        colors={["#f0fdf4", "#dcfce7"]}
-        className="rounded-xl p-4 shadow-lg shadow-green-200/50"
+      <Text style={styles.chartTitle}>{title}</Text>
+      <View
+        style={[
+          styles.chartContainer,
+          {
+            backgroundColor: "#f0fdf4",
+            backgroundGradient: LinearGradient,
+            gradientColors: ["#f0fdf4", "#dcfce7"],
+          },
+        ]}
       >
         <PieChart
           data={data}
@@ -106,7 +215,7 @@ const PieChartSection = ({ title, data }: { title: string; data: any[] }) => {
           paddingLeft="15"
           absolute
         />
-      </LinearGradient>
+      </View>
     </Animated.View>
   );
 };
@@ -202,23 +311,15 @@ const TodayReport = () => {
   }, [staffData]);
 
   return (
-    <LinearGradient colors={["#f3f4f6", "#e5e7eb"]} className="flex-1">
-      <Animated.View
-        entering={FadeInDown.duration(300)}
-        className="my-4 mx-4 bg-white py-4 rounded-sm shadow-sm"
-      >
-        <View className="flex-row items-center justify-between px-2">
+    <LinearGradient colors={["#f3f4f6", "#e5e7eb"]} style={styles.container}>
+      <Animated.View entering={FadeInDown.duration(300)} style={styles.header}>
+        <View style={styles.headerRow}>
           {/* Back Button */}
           <TouchableOpacity onPress={() => router.back()}>
             <Ionicons name="arrow-back" size={24} color="black" />
           </TouchableOpacity>
           {/* Title */}
-          <Text
-            style={{ width: 24 }}
-            className="text-xl font-semibold text-center flex-1"
-          >
-            Admin Dashboard
-          </Text>
+          <Text style={styles.title}>Admin Dashboard</Text>
         </View>
       </Animated.View>
 
@@ -227,7 +328,7 @@ const TodayReport = () => {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        <View className="pb-6">
+        <View style={{ paddingBottom: 24 }}>
           <ScrollView
             horizontal
             pagingEnabled
@@ -248,30 +349,41 @@ const TodayReport = () => {
         {/* Vehicles Table */}
         <Animated.View
           entering={FadeInDown.duration(500).delay(200)}
-          className="bg-white mx-4 rounded-xl shadow-md shadow-gray-200/50 mb-4"
+          style={styles.tableContainer}
         >
-          <View className="p-4 flex-1 justify-center items-center">
-            <Text className="text-xl font-bold text-gray-800">Vehicles</Text>
+          <View
+            style={{
+              padding: 16,
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Text
+              style={{ fontSize: 20, fontWeight: "bold", color: "#374151" }}
+            >
+              Vehicles
+            </Text>
           </View>
           {Array.isArray(vehicleList) && vehicleList.length > 0 ? (
             <FlatList
               data={vehicleList}
               keyExtractor={(item) => item.vehicle}
               ListHeaderComponent={() => (
-                <View className="flex-row justify-around bg-green-100 py-3 border-b border-gray-200 mx-2 rounded-t-lg">
-                  <Text className="w-1/5 text-center font-extrabold text-gray-800">
+                <View style={styles.tableHeader}>
+                  <Text style={[styles.tableHeaderText, { width: "20%" }]}>
                     Vehicle
                   </Text>
-                  <Text className="w-1/5 text-center font-extrabold text-gray-800">
+                  <Text style={[styles.tableHeaderText, { width: "20%" }]}>
                     IN
                   </Text>
-                  <Text className="w-1/5 text-center font-extrabold text-gray-800">
+                  <Text style={[styles.tableHeaderText, { width: "20%" }]}>
                     Out
                   </Text>
-                  <Text className="w-1/5 text-center font-extrabold text-gray-800">
+                  <Text style={[styles.tableHeaderText, { width: "20%" }]}>
                     All
                   </Text>
-                  <Text className="w-1/5 text-center font-extrabold text-gray-800">
+                  <Text style={[styles.tableHeaderText, { width: "20%" }]}>
                     Money
                   </Text>
                 </View>
@@ -279,40 +391,47 @@ const TodayReport = () => {
               renderItem={({ item, index }) => (
                 <Animated.View
                   entering={FadeInDown.duration(400).delay(index * 100)}
-                  className="flex-row justify-around py-3 border-b border-gray-100 mx-2"
+                  style={styles.tableRow}
                 >
-                  <Text className="w-1/5 text-center text-gray-700 font-medium">
+                  <Text style={[styles.tableRowText, { width: "20%" }]}>
                     {item.vehicle}
                   </Text>
-                  <Text className="w-1/5 text-center text-gray-700 font-medium">
+                  <Text style={[styles.tableRowText, { width: "20%" }]}>
                     {item.checkin}
                   </Text>
-                  <Text className="w-1/5 text-center text-gray-700 font-medium">
+                  <Text style={[styles.tableRowText, { width: "20%" }]}>
                     {item.checkout}
                   </Text>
-                  <Text className="w-1/5 text-center text-gray-700 font-medium">
+                  <Text style={[styles.tableRowText, { width: "20%" }]}>
                     {item.total}
                   </Text>
-                  <Text className="w-1/5 text-center text-green-600 font-medium">
+                  <Text style={[styles.tableRowMoney, { width: "20%" }]}>
                     ₹{item.money}
                   </Text>
                 </Animated.View>
               )}
             />
           ) : (
-            <Text className="text-center p-4 text-gray-500 font-medium">
-              No vehicle data available
-            </Text>
+            <Text style={styles.noData}>No vehicle data available</Text>
           )}
         </Animated.View>
 
         {/* Payment Methods Table */}
         <Animated.View
           entering={FadeInDown.duration(500).delay(400)}
-          className="bg-white mx-4 rounded-xl shadow-md shadow-gray-200/50 mb-4"
+          style={styles.tableContainer}
         >
-          <View className="p-4 flex-1 justify-center items-center">
-            <Text className="text-xl font-bold text-gray-800">
+          <View
+            style={{
+              padding: 16,
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Text
+              style={{ fontSize: 20, fontWeight: "bold", color: "#374151" }}
+            >
               Payment Methods
             </Text>
           </View>
@@ -321,11 +440,11 @@ const TodayReport = () => {
               data={paymentMethod}
               keyExtractor={(item) => item.method}
               ListHeaderComponent={() => (
-                <View className="flex-row justify-around bg-green-100 py-3 border-b border-gray-200 mx-2 rounded-t-lg">
-                  <Text className="w-1/2 text-center font-extrabold text-gray-800">
+                <View style={styles.tableHeader}>
+                  <Text style={[styles.tableHeaderText, { width: "50%" }]}>
                     Payment
                   </Text>
-                  <Text className="w-1/2 text-center font-extrabold text-gray-800">
+                  <Text style={[styles.tableHeaderText, { width: "50%" }]}>
                     Money
                   </Text>
                 </View>
@@ -333,31 +452,38 @@ const TodayReport = () => {
               renderItem={({ item, index }) => (
                 <Animated.View
                   entering={FadeInDown.duration(400).delay(index * 100)}
-                  className="flex-row justify-around py-3 border-b border-gray-100 mx-2"
+                  style={styles.tableRow}
                 >
-                  <Text className="w-1/2 text-center text-gray-700 font-medium">
+                  <Text style={[styles.tableRowText, { width: "50%" }]}>
                     {item.method}
                   </Text>
-                  <Text className="w-1/2 text-center text-green-600 font-medium">
+                  <Text style={[styles.tableRowMoney, { width: "50%" }]}>
                     ₹{item.amount}
                   </Text>
                 </Animated.View>
               )}
             />
           ) : (
-            <Text className="text-center p-4 text-gray-500 font-medium">
-              No payment data available
-            </Text>
+            <Text style={styles.noData}>No payment data available</Text>
           )}
         </Animated.View>
 
         {/* Staff Performance Table */}
         <Animated.View
           entering={FadeInDown.duration(500).delay(600)}
-          className="bg-white mx-4 rounded-xl shadow-md shadow-gray-200/50 mb-4"
+          style={styles.tableContainer}
         >
-          <View className="p-4 flex-1 justify-center items-center">
-            <Text className="text-xl font-bold text-gray-800">
+          <View
+            style={{
+              padding: 16,
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Text
+              style={{ fontSize: 20, fontWeight: "bold", color: "#374151" }}
+            >
               Staff Performance
             </Text>
           </View>
@@ -366,17 +492,17 @@ const TodayReport = () => {
               data={staffData}
               keyExtractor={(item) => item.username}
               ListHeaderComponent={() => (
-                <View className="flex-row justify-around bg-green-100 py-3 border-b border-gray-200 mx-2 rounded-t-lg">
-                  <Text className="w-1/4 text-center font-extrabold text-gray-800">
+                <View style={styles.tableHeader}>
+                  <Text style={[styles.tableHeaderText, { width: "25%" }]}>
                     Staff
                   </Text>
-                  <Text className="w-1/4 text-center font-extrabold text-gray-800">
+                  <Text style={[styles.tableHeaderText, { width: "25%" }]}>
                     Check-Ins
                   </Text>
-                  <Text className="w-1/4 text-center font-extrabold text-gray-800">
+                  <Text style={[styles.tableHeaderText, { width: "25%" }]}>
                     Check-Outs
                   </Text>
-                  <Text className="w-1/4 text-center font-extrabold text-gray-800">
+                  <Text style={[styles.tableHeaderText, { width: "25%" }]}>
                     Revenue
                   </Text>
                 </View>
@@ -384,63 +510,75 @@ const TodayReport = () => {
               renderItem={({ item, index }) => (
                 <Animated.View
                   entering={FadeInDown.duration(400).delay(index * 100)}
-                  className="flex-row justify-around py-3 border-b border-gray-100 mx-2"
+                  style={styles.tableRow}
                 >
-                  <Text className="w-1/4 text-center text-gray-700 font-medium">
+                  <Text style={[styles.tableRowText, { width: "25%" }]}>
                     {item.username || "Unknown"}
                   </Text>
-                  <Text className="w-1/4 text-center text-gray-700 font-medium">
+                  <Text style={[styles.tableRowText, { width: "25%" }]}>
                     {item.checkIns || 0}
                   </Text>
-                  <Text className="w-1/4 text-center text-gray-700 font-medium">
+                  <Text style={[styles.tableRowText, { width: "25%" }]}>
                     {item.checkOuts || 0}
                   </Text>
-                  <Text className="w-1/4 text-center text-green-600 font-medium">
+                  <Text style={[styles.tableRowMoney, { width: "25%" }]}>
                     ₹{item.revenue || 0}
                   </Text>
                 </Animated.View>
               )}
             />
           ) : (
-            <Text className="text-center p-4 text-gray-500 font-medium">
-              No staff data available
-            </Text>
+            <Text style={styles.noData}>No staff data available</Text>
           )}
         </Animated.View>
 
         {/* Transaction Logs Table */}
         <Animated.View
           entering={FadeInDown.duration(500).delay(800)}
-          className="bg-white mx-4 rounded-xl shadow-md shadow-gray-200/50 mb-4"
+          style={styles.tableContainer}
         >
-          <View className="p-4 flex-1 justify-center items-center">
-            <Text className="text-xl font-bold text-gray-800">
+          <View
+            style={{
+              padding: 16,
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Text
+              style={{ fontSize: 20, fontWeight: "bold", color: "#374151" }}
+            >
               Transaction Logs
             </Text>
           </View>
           {Array.isArray(transactionLogs) && transactionLogs.length > 0 ? (
             <ScrollView horizontal>
               <View>
-                <View className="flex-row bg-green-100 py-3 border-b border-gray-200">
-                  <Text className="w-20 text-center font-extrabold text-gray-800">
+                <View
+                  style={[
+                    styles.tableHeader,
+                    { flexDirection: "row", paddingVertical: 12 },
+                  ]}
+                >
+                  <Text style={[styles.tableHeaderText, { width: 80 }]}>
                     ID
                   </Text>
-                  <Text className="w-20 text-center font-extrabold text-gray-800">
+                  <Text style={[styles.tableHeaderText, { width: 80 }]}>
                     Type
                   </Text>
-                  <Text className="w-20 text-center font-extrabold text-gray-800">
+                  <Text style={[styles.tableHeaderText, { width: 80 }]}>
                     Vehicle
                   </Text>
-                  <Text className="w-32 text-center font-extrabold text-gray-800">
+                  <Text style={[styles.tableHeaderText, { width: 128 }]}>
                     Time
                   </Text>
-                  <Text className="w-20 text-center font-extrabold text-gray-800">
+                  <Text style={[styles.tableHeaderText, { width: 80 }]}>
                     Staff
                   </Text>
-                  <Text className="w-20 text-center font-extrabold text-gray-800">
+                  <Text style={[styles.tableHeaderText, { width: 80 }]}>
                     Amount
                   </Text>
-                  <Text className="w-20 text-center font-extrabold text-gray-800">
+                  <Text style={[styles.tableHeaderText, { width: 80 }]}>
                     Payment
                   </Text>
                 </View>
@@ -450,29 +588,32 @@ const TodayReport = () => {
                   renderItem={({ item, index }) => (
                     <Animated.View
                       entering={FadeInDown.duration(400).delay(index * 100)}
-                      className="flex-row py-3 border-b border-gray-100"
+                      style={[
+                        styles.tableRow,
+                        { flexDirection: "row", paddingVertical: 12 },
+                      ]}
                     >
-                      <Text className="w-20 text-center text-gray-700 font-medium">
+                      <Text style={[styles.tableRowText, { width: 80 }]}>
                         {item.id}
                       </Text>
-                      <Text className="w-20 text-center text-gray-700 font-medium">
+                      <Text style={[styles.tableRowText, { width: 80 }]}>
                         {item.type}
                       </Text>
-                      <Text className="w-20 text-center text-gray-700 font-medium">
+                      <Text style={[styles.tableRowText, { width: 80 }]}>
                         {item.vehicleType || "N/A"}
                       </Text>
-                      <Text className="w-32 text-center text-gray-700 font-medium">
+                      <Text style={[styles.tableRowText, { width: 128 }]}>
                         {item.timestamp
                           ? new Date(item.timestamp).toLocaleString()
                           : "N/A"}
                       </Text>
-                      <Text className="w-20 text-center text-gray-700 font-medium">
+                      <Text style={[styles.tableRowText, { width: 80 }]}>
                         {item.staff || "Unknown"}
                       </Text>
-                      <Text className="w-20 text-center text-green-600 font-medium">
+                      <Text style={[styles.tableRowMoney, { width: 80 }]}>
                         ₹{item.amount || 0}
                       </Text>
-                      <Text className="w-20 text-center text-gray-700 font-medium">
+                      <Text style={[styles.tableRowText, { width: 80 }]}>
                         {item.paymentMethod || "N/A"}
                       </Text>
                     </Animated.View>
@@ -481,9 +622,7 @@ const TodayReport = () => {
               </View>
             </ScrollView>
           ) : (
-            <Text className="text-center p-4 text-gray-500 font-medium">
-              No transaction logs available
-            </Text>
+            <Text style={styles.noData}>No transaction logs available</Text>
           )}
         </Animated.View>
       </ScrollView>
