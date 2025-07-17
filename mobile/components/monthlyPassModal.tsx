@@ -172,6 +172,7 @@ const MonthlyPassModal: React.FC<MonthlyPassModalProps> = ({
           <TextInput
             style={styles.input}
             placeholder="Mobile Number"
+            maxLength={10}
             value={formData.mobile}
             onChangeText={(text: string) =>
               setFormData({ ...formData, mobile: text })
@@ -181,11 +182,21 @@ const MonthlyPassModal: React.FC<MonthlyPassModalProps> = ({
           <TextInput
             style={styles.input}
             placeholder="Vehicle Number"
+            placeholderTextColor="#888"
+            keyboardType="default"
             value={formData.vehicleNo}
-            onChangeText={(text: string) =>
+            onChangeText={(text) =>
               setFormData({ ...formData, vehicleNo: text })
             }
+            onBlur={() =>
+              setFormData({
+                ...formData,
+                vehicleNo: formData.vehicleNo.toUpperCase(),
+              })
+            }
+            autoCapitalize="characters"
           />
+
           <View>
             <Picker
               selectedValue={formData.vehicleType}
@@ -324,14 +335,16 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#e5e7eb",
     backgroundColor: "#DBEAFE",
-    borderRadius: 4,
-    padding: 10,
+    borderRadius: 2,
+    padding: 12,
     fontSize: 16,
     marginBottom: 12,
   },
   picker: {
-    height: 52,
+    height: 48,
     backgroundColor: "#DBEAFE",
+    marginBottom: 12,
+    borderRadius: 2,
   },
   datePickerButton: {
     borderWidth: 1,

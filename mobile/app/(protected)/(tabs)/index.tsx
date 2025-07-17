@@ -43,7 +43,7 @@ const Index = () => {
       <View style={styles.container}>
         <View>
           <View style={styles.headerBox}>
-            <Text style={styles.greetingText}>hey {user?.username}</Text>
+            <Text style={styles.greetingText}>Hey {user?.username},</Text>
 
             <View style={styles.toggleContainer}>
               <TouchableOpacity
@@ -116,8 +116,8 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   toggleText: {
-    fontSize: 24,
-    color: "#111827",
+    fontSize: 20,
+    color: "#ffffff",
   },
   contentWrapper: {
     paddingTop: 20,

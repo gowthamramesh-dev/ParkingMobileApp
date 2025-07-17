@@ -65,6 +65,7 @@ const CheckOut = () => {
           <TextInput
             placeholder="Enter Token ID"
             value={tokenId}
+            placeholderTextColor="#888"
             onChangeText={settokenId}
             style={styles.input}
           />
@@ -108,7 +109,7 @@ const styles = StyleSheet.create({
     gap: 20,
   },
   title: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: "bold",
   },
   formContainer: {
@@ -140,7 +141,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   submitButton: {
-    backgroundColor: "#10B981",
+    backgroundColor: "#4ade80",
     padding: 12,
     borderRadius: 8,
     alignItems: "center",

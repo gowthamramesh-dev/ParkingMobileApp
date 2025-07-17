@@ -69,7 +69,7 @@ const Signup = () => {
           >
             <View style={styles.headingContainer}>
               <Text style={styles.appName}>Parkingz</Text>
-              <Text style={styles.tagline}>Let's get Started.</Text>
+              <Text style={styles.tagline}>Let&apos;s get Started.</Text>
             </View>
 
             <View style={styles.formWrapper}>
@@ -84,6 +84,7 @@ const Signup = () => {
                 <TextInput
                   placeholder="Username"
                   value={userName}
+                  placeholderTextColor="#888"
                   onChangeText={setUserName}
                   style={styles.inputText}
                 />
@@ -97,6 +98,7 @@ const Signup = () => {
                   placeholder="Email"
                   value={email}
                   onChangeText={setEmail}
+                  placeholderTextColor="#888"
                   keyboardType="email-address"
                   autoCapitalize="none"
                   style={styles.inputText}
@@ -115,6 +117,7 @@ const Signup = () => {
                   placeholder="Password"
                   value={password}
                   onChangeText={setPassword}
+                  placeholderTextColor="#888"
                   secureTextEntry={!showPassword}
                   style={styles.inputText}
                 />
@@ -141,6 +144,7 @@ const Signup = () => {
                   placeholder="Confirm Password"
                   value={confirmPassword}
                   onChangeText={setConfirmPassword}
+                  placeholderTextColor="#888"
                   secureTextEntry={!showPassword}
                   style={styles.inputText}
                 />

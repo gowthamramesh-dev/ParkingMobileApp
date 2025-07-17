@@ -50,7 +50,11 @@ const CheckinCard = ({ item }: any) => {
           <TouchableOpacity
             onPress={() => {
               Clipboard.setStringAsync(item.tokenId);
-              Alert.alert("Copied!", ` ${item.tokenId} copied to clipboard.`);
+              Toast.show({
+                type: "success",
+                text1: "Copied!",
+                text2: ` Token Id copied to clipboard.`,
+              });
             }}
           >
             <Text style={styles.tokenCopy}>
@@ -125,6 +129,7 @@ const VehicleList = () => {
         <Ionicons name="search-outline" size={24} />
         <TextInput
           placeholder="Search vehicle"
+          placeholderTextColor="#888"
           value={search}
           onChangeText={setSearch}
           style={styles.searchInput}
@@ -175,8 +180,8 @@ const VehicleList = () => {
             onValueChange={setCheckType}
             style={{ height: 50, backgroundColor: "transparent" }}
           >
-            <Picker.Item label="Check In" value="checkins" />
-            <Picker.Item label="Check Out" value="checkouts" />
+            <Picker.Item color="#000" label="Check In" value="checkins" />
+            <Picker.Item color="#000" label="Check Out" value="checkouts" />
           </Picker>
         </View>
         <TouchableOpacity
@@ -239,7 +244,13 @@ const VehicleList = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F3F4F6", padding: 16, gap: 12 },
+  container: {
+    flex: 1,
+    backgroundColor: "#F3F4F6",
+    padding: 16,
+    gap: 12,
+    marginBottom: 60,
+  },
   searchBox: {
     flexDirection: "row",
     alignItems: "center",
@@ -255,7 +266,7 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   centeredTextBox: { alignItems: "center", marginBottom: 8 },
-  vehicleTitle: { fontSize: 20, fontWeight: "600" },
+  vehicleTitle: { fontSize: 20, fontWeight: "500" },
   vehicleType: {
     marginHorizontal: 8,
     alignItems: "center",
@@ -320,8 +331,16 @@ const styles = StyleSheet.create({
   vehicleNoContainer: { flexDirection: "row", alignItems: "center", gap: 4 },
   vehicleNo: { fontSize: 16, color: "#6b7280" },
   tokenCopy: { fontSize: 12, color: "#10b981" },
-  detailsContainer: { backgroundColor: "#f3f4f6", padding: 8, borderRadius: 4 },
-  rowBetween: { flexDirection: "row", justifyContent: "space-between" },
+  detailsContainer: {
+    backgroundColor: "#f3f4f6",
+    paddingHorizontal: 4,
+    borderRadius: 4,
+  },
+  rowBetween: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
   detailRowGroup: { marginTop: 4, gap: 4 },
   boldText: { fontWeight: "500", color: "#1f2937" },
   greenText: { fontWeight: "600", color: "#059669" },

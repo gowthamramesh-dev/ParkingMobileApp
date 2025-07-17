@@ -314,11 +314,15 @@ const getAdminById = async (req, res) => {
 
 const updateAdmin = async (req, res) => {
   try {
-    const { username, password } = req.body;
-
+    const { username, password, avatar } = req.body;
     const updateData = { username };
+
     if (password) {
       updateData.password = await bcrypt.hash(password, 10);
+    }
+
+    if (avatar) {
+      updateData.profileImage = avatar;
     }
 
     const updatedAdmin = await Admin.findByIdAndUpdate(

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import {
   View,
   Text,
@@ -12,18 +12,19 @@ import {
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
-import Toast from "react-native-toast-message";
 import userAuthStore from "../../../utils/store";
-import ToastManager from "toastify-react-native/components/ToastManager";
+import ToastManager, { Toast } from "toastify-react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 const Profile = () => {
   const { user, logOut, updateProfile } = userAuthStore();
   const router = useRouter();
 
-  const parsedUser = typeof user === "string" ? JSON.parse(user) : user;
+  const parsedUser = useMemo(() => {
+    return typeof user === "string" ? JSON.parse(user) : user;
+  }, [user]);
 
-  const [avatar, setAvatar] = useState(parsedUser?.avatar || null);
+  const [avatar, setAvatar] = useState(parsedUser?.profileImage || null);
   const [showModal, setShowModal] = useState(false);
   const [username, setUsername] = useState(parsedUser?.username || "");
   const [oldPassword, setOldPassword] = useState("");
@@ -68,7 +69,20 @@ const Profile = () => {
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       quality: 1,
       allowsEditing: true,
+      base64: true,
     });
+
+    if (!result.canceled) {
+      const base64Image = `data:image/jpeg;base64,${result.assets[0].base64}`;
+      setAvatar(base64Image);
+
+      const res = await updateProfile(
+        parsedUser._id,
+        parsedUser.username,
+        "",
+        base64Image
+      );
+    }
 
     if (!result.canceled) {
       const selectedImage = result.assets[0].uri;
@@ -255,12 +269,14 @@ const Profile = () => {
                 value={username}
                 onChangeText={setUsername}
                 style={styles.modalInput}
+                placeholderTextColor="#888"
                 placeholder="Enter new username"
               />
               <TextInput
                 value={oldPassword}
                 onChangeText={setOldPassword}
                 secureTextEntry
+                placeholderTextColor="#888"
                 style={styles.modalInput}
                 placeholder="Enter old password"
               />
@@ -268,6 +284,7 @@ const Profile = () => {
                 value={newPassword}
                 onChangeText={setNewPassword}
                 secureTextEntry
+                placeholderTextColor="#888"
                 style={styles.modalInput}
                 placeholder="Enter new password"
               />

@@ -91,7 +91,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 2,
     elevation: 2,
-    marginBottom: 16,
+    marginBottom: 20,
   },
   tableHeader: {
     flexDirection: "row",
@@ -324,6 +324,7 @@ const TodayReport = () => {
       </Animated.View>
 
       <ScrollView
+        style={{ marginBottom: 60 }}
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }

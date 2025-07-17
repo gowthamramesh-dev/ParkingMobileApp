@@ -36,4 +36,4 @@ app.listen(PORT, () => {
   console.log("Server is Running on Port", PORT);
 });
 
-console.log("MONGO_URI from env:", process.env.MONGO_URI); // ✅ Correct key
+console.log("MONGO_URI from env:", process.env.MONGO_URI);

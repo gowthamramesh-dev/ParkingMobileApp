@@ -21,6 +21,7 @@ const MonthlyPass = () => {
   const [editPassId, setEditPassId] = useState<string | null>(null);
   const [showDurationModal, setShowDurationModal] = useState(false);
   const [selectedMonths, setSelectedMonths] = useState<number>(3);
+  const [isTabLoading, setIsTabLoading] = useState(false);
 
   const {
     getMonthlyPass,
@@ -31,9 +32,14 @@ const MonthlyPass = () => {
   } = userAuthStore();
 
   useEffect(() => {
-    if (activeTab !== "create") {
-      getMonthlyPass(activeTab);
-    }
+    const fetchTabData = async () => {
+      if (activeTab !== "create") {
+        setIsTabLoading(true);
+        await getMonthlyPass(activeTab);
+        setIsTabLoading(false);
+      }
+    };
+    fetchTabData();
   }, [activeTab]);
 
   const handlePassCreated = () => {
@@ -155,7 +161,7 @@ const MonthlyPass = () => {
               styles.tabButton,
               activeTab === tab ? styles.activeTab : styles.inactiveTab,
             ]}
-            disabled={isLoading}
+            disabled={isTabLoading}
             onPress={() => setActiveTab(tab)}
           >
             <Text
@@ -179,7 +185,7 @@ const MonthlyPass = () => {
         >
           <Text style={styles.createButtonText}>Create New Pass</Text>
         </TouchableOpacity>
-      ) : isLoading ? (
+      ) : isTabLoading ? (
         <ActivityIndicator size="large" color="#22c55e" style={styles.loader} />
       ) : (
         <FlatList
@@ -254,7 +260,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     justifyContent: "center",
     alignItems: "center",
-    paddingVertical: 16,
+    paddingVertical: 12,
     borderRadius: 4,
     elevation: 2,
   },

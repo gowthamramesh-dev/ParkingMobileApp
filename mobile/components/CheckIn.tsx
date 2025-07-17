@@ -123,15 +123,20 @@ const CheckIn = () => {
         <TextInput
           placeholder="Name"
           value={name}
+          placeholderTextColor="#888"
           onChangeText={setName}
           style={styles.input}
         />
         <TextInput
           placeholder="Vehicle Number"
           value={vehicleNo}
-          onChangeText={(text) => setVehicleNo(text.toUpperCase())}
+          placeholderTextColor="#888"
+          onChangeText={setVehicleNo}
+          onBlur={() => setVehicleNo(vehicleNo.toUpperCase())}
+          autoCapitalize="characters"
           style={styles.input}
         />
+
         <View style={styles.pickerContainer}>
           <Picker
             selectedValue={vehicleType}
@@ -142,6 +147,7 @@ const CheckIn = () => {
             {vehicleTypes.map((type) => (
               <Picker.Item
                 key={type}
+                color="#000"
                 label={type.charAt(0).toUpperCase() + type.slice(1)}
                 value={type}
               />
@@ -152,6 +158,7 @@ const CheckIn = () => {
           placeholder="Mobile Number"
           maxLength={10}
           value={mobile}
+          placeholderTextColor="#888"
           onChangeText={setMobile}
           keyboardType="number-pad"
           style={styles.input}
@@ -165,6 +172,7 @@ const CheckIn = () => {
             <Picker.Item label="Select Days" value="" />
             {[...Array(7)].map((_, i) => (
               <Picker.Item
+                color="#000"
                 key={i + 1}
                 label={`${i + 1} Day${i > 0 ? "s" : ""}`}
                 value={`${i + 1}`}
@@ -178,11 +186,11 @@ const CheckIn = () => {
             onValueChange={setPaymentMethod}
             style={styles.picker}
           >
-            <Picker.Item label="Select Payment Method" value="" />
-            <Picker.Item label="Cash" value="cash" />
-            <Picker.Item label="GPay" value="gpay" />
-            <Picker.Item label="PhonePe" value="phonepe" />
-            <Picker.Item label="Paytm" value="paytm" />
+            <Picker.Item color="#000" label="Select Payment Method" value="" />
+            <Picker.Item color="#000" label="Cash" value="cash" />
+            <Picker.Item color="#000" label="GPay" value="gpay" />
+            <Picker.Item color="#000" label="PhonePe" value="phonepe" />
+            <Picker.Item color="#000" label="Paytm" value="paytm" />
           </Picker>
         </View>
         <View style={styles.amountContainer}>
@@ -209,7 +217,7 @@ const styles = StyleSheet.create({
     gap: 20,
   },
   title: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: "bold",
   },
   formContainer: {
@@ -252,7 +260,7 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   submitButton: {
-    backgroundColor: "#10B981",
+    backgroundColor: "#4ade80",
     padding: 12,
     borderRadius: 8,
     alignItems: "center",
