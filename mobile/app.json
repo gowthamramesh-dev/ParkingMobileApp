@@ -41,19 +41,15 @@
           "backgroundColor": "#ffffff"
         }
       ],
-      [
-        "expo-camera"
-      ]
+      ["expo-camera"]
     ],
     "experiments": {
       "typedRoutes": true
     },
     "extra": {
       "router": {},
-      "eas": {
-        "projectId": "3d17d88d-73b6-4fd4-9560-61b6847419a2"
-      }
+      "eas": {}
     },
-    "owner": "goetham"
+    "owner": "gowthamramesh-dev"
   }
 }
