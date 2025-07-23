@@ -12,9 +12,9 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import Toast from "react-native-toast-message";
 import userAuthStore from "@/utils/store";
 import { useNavigation } from "@react-navigation/native";
+import ToastManager, { Toast } from "toastify-react-native";
 
 const CreateStaff = () => {
   const [username, setUsername] = useState("");
@@ -84,6 +84,7 @@ const CreateStaff = () => {
           <TextInput
             placeholder="Enter username"
             value={username}
+            placeholderTextColor="#888"
             onChangeText={setUsername}
             style={styles.input}
           />
@@ -93,6 +94,7 @@ const CreateStaff = () => {
             <TextInput
               value={password}
               onChangeText={setPassword}
+              placeholderTextColor="#888"
               placeholder="Enter password"
               secureTextEntry={!showPassword}
               style={styles.passwordInput}
@@ -110,6 +112,7 @@ const CreateStaff = () => {
           <TextInput
             placeholder="Enter building name (e.g., Building A)"
             value={buildingName}
+            placeholderTextColor="#888"
             onChangeText={setBuildingName}
             style={styles.input}
           />
@@ -118,6 +121,7 @@ const CreateStaff = () => {
           <TextInput
             placeholder="Enter building location (e.g., Vellore)"
             value={buildingLocation}
+            placeholderTextColor="#888"
             onChangeText={setBuildingLocation}
             style={styles.input}
           />
@@ -135,7 +139,7 @@ const CreateStaff = () => {
           </TouchableOpacity>
         </KeyboardAvoidingView>
       </ScrollView>
-      <Toast />
+      <ToastManager showCloseIcon={false} />
     </SafeAreaView>
   );
 };

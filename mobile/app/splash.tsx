@@ -140,7 +140,7 @@ const ParkingSplashScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#4CAF50", // Green
+    backgroundColor: "#58EB82",
   },
   innerContainer: {
     flex: 1,

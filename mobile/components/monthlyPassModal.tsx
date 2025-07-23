@@ -6,6 +6,7 @@ import {
   TextInput,
   TouchableOpacity,
   ActivityIndicator,
+  StyleSheet,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import DatePicker from "@react-native-community/datetimepicker";
@@ -151,19 +152,17 @@ const MonthlyPassModal: React.FC<MonthlyPassModalProps> = ({
 
     setTimeout(() => {
       setModalVisible(false);
-      onPassCreated(result.pass); // Pass the created pass to the callback
+      onPassCreated(result.pass);
     }, 2000);
   };
 
   return (
     <Modal visible={isModalVisible} animationType="fade" transparent>
-      <View className="flex-1 justify-center items-center bg-black/50">
-        <View className="bg-white p-5 gap-3 rounded-sm w-4/5">
-          <Text className="text-lg font-semibold mb-4 text-center">
-            Create New Pass
-          </Text>
+      <View style={styles.modalBackground}>
+        <View style={styles.modalContainer}>
+          <Text style={styles.modalTitle}>Create New Pass</Text>
           <TextInput
-            className="border border-gray-200 bg-blue-100 rounded-sm p-3 text-base"
+            style={styles.input}
             placeholder="Customer Name"
             value={formData.name}
             onChangeText={(text: string) =>
@@ -171,8 +170,9 @@ const MonthlyPassModal: React.FC<MonthlyPassModalProps> = ({
             }
           />
           <TextInput
-            className="border border-gray-200 bg-blue-100 rounded-sm p-3 text-base"
+            style={styles.input}
             placeholder="Mobile Number"
+            maxLength={10}
             value={formData.mobile}
             onChangeText={(text: string) =>
               setFormData({ ...formData, mobile: text })
@@ -180,20 +180,30 @@ const MonthlyPassModal: React.FC<MonthlyPassModalProps> = ({
             keyboardType="phone-pad"
           />
           <TextInput
-            className="border border-gray-200 bg-blue-100 rounded-sm p-3 text-base"
+            style={styles.input}
             placeholder="Vehicle Number"
+            placeholderTextColor="#888"
+            keyboardType="default"
             value={formData.vehicleNo}
-            onChangeText={(text: string) =>
+            onChangeText={(text) =>
               setFormData({ ...formData, vehicleNo: text })
             }
+            onBlur={() =>
+              setFormData({
+                ...formData,
+                vehicleNo: formData.vehicleNo.toUpperCase(),
+              })
+            }
+            autoCapitalize="characters"
           />
+
           <View>
             <Picker
               selectedValue={formData.vehicleType}
               onValueChange={(text) =>
                 setFormData({ ...formData, vehicleType: text })
               }
-              style={{ height: 52, backgroundColor: "#DBEAFE" }}
+              style={styles.picker}
             >
               <Picker.Item label="Select Vehicle Type" value="" />
               <Picker.Item label="Cycle" value="cycle" />
@@ -210,7 +220,7 @@ const MonthlyPassModal: React.FC<MonthlyPassModalProps> = ({
               onValueChange={(text) =>
                 setFormData({ ...formData, duration: text })
               }
-              style={{ height: 52, backgroundColor: "#DBEAFE" }}
+              style={styles.picker}
             >
               <Picker.Item label="Select Duration" value="" />
               {[3, 6, 9, 12].map((m) => (
@@ -219,10 +229,10 @@ const MonthlyPassModal: React.FC<MonthlyPassModalProps> = ({
             </Picker>
           </View>
           <TouchableOpacity
-            className="border border-gray-200 bg-blue-100 rounded-sm p-3 text-base"
+            style={styles.datePickerButton}
             onPress={() => setDatePickerVisible(true)}
           >
-            <Text className="text-base">
+            <Text style={styles.datePickerText}>
               {formData.startDate ? formData.startDate : "Select Start Date"}
             </Text>
           </TouchableOpacity>
@@ -250,7 +260,7 @@ const MonthlyPassModal: React.FC<MonthlyPassModalProps> = ({
               onValueChange={(text) =>
                 setFormData({ ...formData, paymentMethod: text })
               }
-              style={{ height: 52, backgroundColor: "#DBEAFE" }}
+              style={styles.picker}
             >
               <Picker.Item label="Select Payment Method" value="" />
               <Picker.Item label="Cash" value="cash" />
@@ -260,42 +270,38 @@ const MonthlyPassModal: React.FC<MonthlyPassModalProps> = ({
             </Picker>
           </View>
           <TextInput
-            className="border border-gray-200 bg-blue-100 rounded-sm p-3 text-base"
+            style={styles.input}
             placeholder="End Date (YYYY-MM-DD)"
             value={formData.endDate}
             editable={false}
           />
           {formData.vehicleType && formData.duration && (
-            <View className="mt-2">
-              <Text className="text-base font-medium">
+            <View style={styles.amountContainer}>
+              <Text style={styles.amountText}>
                 Payment Method: {formData.paymentMethod || "Not selected"}
               </Text>
-              <Text className="text-base font-medium">
+              <Text style={styles.amountText}>
                 Amount: ₹{calculateAmount()}
               </Text>
             </View>
           )}
-          <View className="flex-row justify-between mt-4">
+          <View style={styles.buttonContainer}>
             <TouchableOpacity
-              className="bg-red-500 py-3 px-4 rounded-sm flex-1 mr-2"
+              style={styles.cancelButton}
               onPress={() => setModalVisible(false)}
             >
-              <Text className="text-white text-base font-medium text-center">
-                Cancel
-              </Text>
+              <Text style={styles.buttonText}>Cancel</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              className="bg-green-600 py-3 px-4 justify-center items-center rounded-sm flex-1 ml-2"
+              style={styles.createButton}
               onPress={handleCreatePass}
             >
               {isLoading ? (
-                <View className="bg-white p-2 rounded-full">
+                <View style={styles.loadingContainer}>
                   <ActivityIndicator size="small" color="#10B981" />
                 </View>
               ) : (
-                <Text className="text-center text-xl text-white font-semibold">
-                  Create
-                </Text>
+                <Text style={styles.buttonText}>Create</Text>
               )}
             </TouchableOpacity>
           </View>
@@ -305,5 +311,92 @@ const MonthlyPassModal: React.FC<MonthlyPassModalProps> = ({
     </Modal>
   );
 };
+
+const styles = StyleSheet.create({
+  modalBackground: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContainer: {
+    backgroundColor: "#ffffff",
+    padding: 20,
+    borderRadius: 8,
+    width: "80%",
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    marginBottom: 16,
+    textAlign: "center",
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+    backgroundColor: "#DBEAFE",
+    borderRadius: 2,
+    padding: 12,
+    fontSize: 16,
+    marginBottom: 12,
+  },
+  picker: {
+    height: 48,
+    backgroundColor: "#DBEAFE",
+    marginBottom: 12,
+    borderRadius: 2,
+  },
+  datePickerButton: {
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+    backgroundColor: "#DBEAFE",
+    borderRadius: 4,
+    padding: 10,
+    marginBottom: 12,
+  },
+  datePickerText: {
+    fontSize: 16,
+  },
+  amountContainer: {
+    marginTop: 8,
+  },
+  amountText: {
+    fontSize: 16,
+    fontWeight: "500",
+  },
+  buttonContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginTop: 16,
+  },
+  cancelButton: {
+    backgroundColor: "#EF4444",
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 4,
+    flex: 1,
+    marginRight: 8,
+  },
+  createButton: {
+    backgroundColor: "#10B981",
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 4,
+    flex: 1,
+    marginLeft: 8,
+    alignItems: "center",
+  },
+  buttonText: {
+    color: "#ffffff",
+    textAlign: "center",
+    fontSize: 16,
+    fontWeight: "500",
+  },
+  loadingContainer: {
+    backgroundColor: "#ffffff",
+    padding: 4,
+    borderRadius: 50,
+  },
+});
 
 export default MonthlyPassModal;

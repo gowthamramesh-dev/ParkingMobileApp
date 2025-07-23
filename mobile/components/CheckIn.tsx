@@ -5,6 +5,7 @@ import {
   TextInput,
   TouchableOpacity,
   ActivityIndicator,
+  StyleSheet,
 } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -116,31 +117,37 @@ const CheckIn = () => {
   };
 
   return (
-    <View className="gap-5 p-4">
-      <Text className="text-2xl font-bold">Check In</Text>
-      <View className="bg-white rounded-lg shadow-md p-4 gap-3 space-y-4">
+    <View style={styles.container}>
+      <Text style={styles.title}>Check In</Text>
+      <View style={styles.formContainer}>
         <TextInput
           placeholder="Name"
           value={name}
+          placeholderTextColor="#888"
           onChangeText={setName}
-          className="h-12 w-full px-3 rounded-sm border border-gray-200 bg-blue-100 text-base"
+          style={styles.input}
         />
         <TextInput
           placeholder="Vehicle Number"
           value={vehicleNo}
-          onChangeText={(text) => setVehicleNo(text.toUpperCase())}
-          className="h-12 w-full px-3 rounded-sm border border-gray-200 bg-blue-100 text-base"
+          placeholderTextColor="#888"
+          onChangeText={setVehicleNo}
+          onBlur={() => setVehicleNo(vehicleNo.toUpperCase())}
+          autoCapitalize="characters"
+          style={styles.input}
         />
-        <View className="h-12 w-full rounded-sm border border-gray-200 bg-blue-100">
+
+        <View style={styles.pickerContainer}>
           <Picker
             selectedValue={vehicleType}
             onValueChange={setVehicleType}
-            style={{ height: 48, backgroundColor: "transparent" }}
+            style={styles.picker}
           >
             <Picker.Item label="Select Vehicle Type" value="" />
             {vehicleTypes.map((type) => (
               <Picker.Item
                 key={type}
+                color="#000"
                 label={type.charAt(0).toUpperCase() + type.slice(1)}
                 value={type}
               />
@@ -151,19 +158,21 @@ const CheckIn = () => {
           placeholder="Mobile Number"
           maxLength={10}
           value={mobile}
+          placeholderTextColor="#888"
           onChangeText={setMobile}
           keyboardType="number-pad"
-          className="h-12 w-full px-3 rounded-sm border border-gray-200 bg-blue-100 text-base"
+          style={styles.input}
         />
-        <View className="h-12 w-full rounded-sm border border-gray-200 bg-blue-100">
+        <View style={styles.pickerContainer}>
           <Picker
             selectedValue={days}
             onValueChange={(val) => setDays(val)}
-            style={{ height: 48, backgroundColor: "transparent" }}
+            style={styles.picker}
           >
             <Picker.Item label="Select Days" value="" />
             {[...Array(7)].map((_, i) => (
               <Picker.Item
+                color="#000"
                 key={i + 1}
                 label={`${i + 1} Day${i > 0 ? "s" : ""}`}
                 value={`${i + 1}`}
@@ -171,34 +180,29 @@ const CheckIn = () => {
             ))}
           </Picker>
         </View>
-        <View className="h-12 w-full rounded-sm border border-gray-200 bg-blue-100">
+        <View style={styles.pickerContainer}>
           <Picker
             selectedValue={paymentMethod}
             onValueChange={setPaymentMethod}
-            style={{ height: 48, backgroundColor: "transparent" }}
+            style={styles.picker}
           >
-            <Picker.Item label="Select Payment Method" value="" />
-            <Picker.Item label="Cash" value="cash" />
-            <Picker.Item label="GPay" value="gpay" />
-            <Picker.Item label="PhonePe" value="phonepe" />
-            <Picker.Item label="Paytm" value="paytm" />
+            <Picker.Item color="#000" label="Select Payment Method" value="" />
+            <Picker.Item color="#000" label="Cash" value="cash" />
+            <Picker.Item color="#000" label="GPay" value="gpay" />
+            <Picker.Item color="#000" label="PhonePe" value="phonepe" />
+            <Picker.Item color="#000" label="Paytm" value="paytm" />
           </Picker>
         </View>
-        <View className="items-center">
-          <Text className="text-xl font-semibold">Amount: ₹{amount}</Text>
+        <View style={styles.amountContainer}>
+          <Text style={styles.amountText}>Amount: ₹{amount}</Text>
         </View>
-        <TouchableOpacity
-          className="bg-green-600 p-3 rounded-lg items-center"
-          onPress={handleSubmit}
-        >
+        <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
           {isLoading ? (
-            <View className="bg-white p-2 rounded-full">
+            <View style={styles.loadingContainer}>
               <ActivityIndicator size="small" color="#10B981" />
             </View>
           ) : (
-            <Text className="text-center text-xl text-white font-semibold">
-              Enter
-            </Text>
+            <Text style={styles.submitButtonText}>Enter</Text>
           )}
         </TouchableOpacity>
       </View>
@@ -206,5 +210,72 @@ const CheckIn = () => {
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    padding: 16,
+    gap: 20,
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: "bold",
+  },
+  formContainer: {
+    backgroundColor: "#ffffff",
+    borderRadius: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    padding: 16,
+    gap: 12,
+  },
+  input: {
+    height: 48,
+    width: "100%",
+    paddingHorizontal: 12,
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+    backgroundColor: "#ebf8ff",
+    fontSize: 16,
+  },
+  pickerContainer: {
+    height: 48,
+    width: "100%",
+    borderRadius: 4,
+    borderWidth: 1,
+    borderColor: "#e5e7eb",
+    backgroundColor: "#ebf8ff",
+  },
+  picker: {
+    height: 48,
+    backgroundColor: "transparent",
+  },
+  amountContainer: {
+    alignItems: "center",
+  },
+  amountText: {
+    fontSize: 20,
+    fontWeight: "600",
+  },
+  submitButton: {
+    backgroundColor: "#4ade80",
+    padding: 12,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  submitButtonText: {
+    textAlign: "center",
+    fontSize: 20,
+    color: "#ffffff",
+    fontWeight: "600",
+  },
+  loadingContainer: {
+    backgroundColor: "#ffffff",
+    padding: 4,
+    borderRadius: 50,
+  },
+});
 
 export default CheckIn;

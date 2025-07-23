@@ -84,6 +84,7 @@ const Login = () => {
             value={userName}
             onChangeText={setUserName}
             style={styles.inputText}
+            placeholderTextColor="#888"
           />
         </View>
 
@@ -95,6 +96,7 @@ const Login = () => {
             placeholder="Password"
             value={password}
             onChangeText={setPassword}
+            placeholderTextColor="#888"
             secureTextEntry={!showPassword}
             style={styles.inputText}
           />
@@ -151,7 +153,7 @@ const Login = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#d1fae5", // Tailwind green-100
+    backgroundColor: "#d1fae5",
   },
   scrollContainer: {
     flexGrow: 1,

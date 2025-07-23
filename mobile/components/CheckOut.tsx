@@ -4,8 +4,8 @@ import {
   View,
   TextInput,
   TouchableOpacity,
-  Alert,
   ActivityIndicator,
+  StyleSheet,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import Scan from "./Scan";
@@ -58,23 +58,27 @@ const CheckOut = () => {
   };
 
   return (
-    <View className="gap-5 p-4">
-      <Text className="text-2xl font-bold">Check Out</Text>
-      <View className="bg-white rounded-lg shadow-md p-4 gap-4 space-y-4">
-        <View className="flex-row items-center">
+    <View style={styles.container}>
+      <Text style={styles.title}>Check Out</Text>
+      <View style={styles.formContainer}>
+        <View style={styles.inputContainer}>
           <TextInput
             placeholder="Enter Token ID"
             value={tokenId}
+            placeholderTextColor="#888"
             onChangeText={settokenId}
-            className="rounded text-xl px-3 h-12 bg-blue-100 flex-1"
+            style={styles.input}
           />
-          <TouchableOpacity onPress={() => setToscan(!Toscan)} className="ml-2">
+          <TouchableOpacity
+            onPress={() => setToscan(!Toscan)}
+            style={styles.scanButton}
+          >
             <Ionicons name="scan-outline" size={28} color="#1f2937" />
           </TouchableOpacity>
         </View>
 
         {Toscan && (
-          <View className="items-center">
+          <View style={styles.scanContainer}>
             <Scan
               onScanned={(data) => {
                 settokenId(data);
@@ -84,18 +88,13 @@ const CheckOut = () => {
           </View>
         )}
 
-        <TouchableOpacity
-          className="bg-green-600 p-3 rounded-lg items-center"
-          onPress={handleSubmit}
-        >
+        <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
           {isLoading ? (
-            <View className="bg-white p-2 rounded-full">
+            <View style={styles.loadingContainer}>
               <ActivityIndicator size="small" color="#10B981" />
             </View>
           ) : (
-            <Text className="text-center text-xl text-white font-semibold">
-              Enter
-            </Text>
+            <Text style={styles.submitButtonText}>Enter</Text>
           )}
         </TouchableOpacity>
       </View>
@@ -103,5 +102,61 @@ const CheckOut = () => {
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    padding: 16,
+    gap: 20,
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: "bold",
+  },
+  formContainer: {
+    backgroundColor: "#ffffff",
+    borderRadius: 8,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    padding: 16,
+    gap: 16,
+  },
+  inputContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  input: {
+    borderRadius: 4,
+    height: 48,
+    backgroundColor: "#ebf8ff",
+    flex: 1,
+    paddingHorizontal: 12,
+    fontSize: 20,
+  },
+  scanButton: {
+    marginLeft: 8,
+  },
+  scanContainer: {
+    alignItems: "center",
+  },
+  submitButton: {
+    backgroundColor: "#4ade80",
+    padding: 12,
+    borderRadius: 8,
+    alignItems: "center",
+  },
+  submitButtonText: {
+    textAlign: "center",
+    fontSize: 20,
+    color: "#ffffff",
+    fontWeight: "600",
+  },
+  loadingContainer: {
+    backgroundColor: "#ffffff",
+    padding: 4,
+    borderRadius: 50,
+  },
+});
 
 export default CheckOut;

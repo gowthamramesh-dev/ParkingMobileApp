@@ -10,10 +10,10 @@ import {
   StyleSheet,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import Toast from "react-native-toast-message";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
 import userAuthStore from "@/utils/store";
+import ToastManager, { Toast } from "toastify-react-native";
 
 const vehicleTypes = ["cycle", "bike", "car", "van", "lorry", "bus"];
 
@@ -83,10 +83,20 @@ const PriceDetails = () => {
       Toast.show({
         type: "success",
         text1: "Success",
-        text2: `${activeTab} prices added successfully ✅`,
+        text2: `${activeTab} prices added successfully.`,
+        position: "top",
+        visibilityTime: 2000,
+        autoHide: true,
       });
     } catch (err) {
-      Toast.show({ type: "error", text1: "Error", text2: String(err) });
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: String(err),
+        position: "top",
+        visibilityTime: 2000,
+        autoHide: true,
+      });
     }
   };
 
@@ -101,10 +111,20 @@ const PriceDetails = () => {
       Toast.show({
         type: "success",
         text1: "Success",
-        text2: `${activeTab} prices updated successfully ✅`,
+        text2: `${activeTab} prices updated successfully.`,
+        position: "top",
+        visibilityTime: 2000,
+        autoHide: true,
       });
     } catch (err) {
-      Toast.show({ type: "error", text1: "Error", text2: String(err) });
+      Toast.show({
+        type: "error",
+        text1: "Error",
+        text2: String(err),
+        position: "top",
+        visibilityTime: 2000,
+        autoHide: true,
+      });
     }
   };
 
@@ -122,7 +142,7 @@ const PriceDetails = () => {
           <Ionicons name="arrow-back" size={24} color="transparent" />
         </View>
 
-        <ScrollView>
+        <ScrollView style={{ marginBottom: 60 }}>
           <View style={styles.tabRow}>
             <TouchableOpacity
               style={[
@@ -201,7 +221,7 @@ const PriceDetails = () => {
           </View>
         </ScrollView>
       </View>
-      <Toast />
+      <ToastManager showCloseIcon={false} />
     </KeyboardAvoidingView>
   );
 };

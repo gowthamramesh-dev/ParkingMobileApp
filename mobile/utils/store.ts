@@ -3,7 +3,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 
-const URL = "https://parking-servers.onrender.com/";
+const URL = "https://parking-servers-1.onrender.com/";
+// const URL = "https://q8dcnx0t-5000.inc1.devtunnels.ms/";
 
 interface StaffPerformance {
   username: string;
@@ -231,6 +232,7 @@ const userAuthStore = create<UserAuthState>((set, get) => ({
   monthlyPassActive: null,
   monthlyPassExpired: null,
   hydrated: false,
+  revenueData: null,
 
   restoreSession: async () => {
     try {
@@ -756,27 +758,33 @@ const userAuthStore = create<UserAuthState>((set, get) => ({
   },
 
   fetchRevenueReport: async () => {
-    try {
-      const token = get().token || (await AsyncStorage.getItem("token"));
+    set({ isLoading: true });
 
-      const res = await axios.get(`${URL}api/getRevenueReport`, {
+    try {
+      const token = await AsyncStorage.getItem("token");
+      if (!token) {
+        throw new Error("Token not found. Please login again.");
+      }
+
+      const response = await axios.get(`${URL}api/getRevenueReport`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
-      const report = {
-        role: res.data?.role,
-        totalVehicles: res.data?.totalVehicles,
-        revenue: res.data?.revenue,
-        vehicles: res.data?.vehicles,
-      };
-
-      console.log("✅ Today Report Fetched:", report);
-      set({ report });
-    } catch (error: any) {
-      console.error("Zustand Revenue Report Error:", error.message);
-      set({ report: null });
+      set({
+        revenueData: response.data,
+        loading: false,
+      });
+    } catch (err: any) {
+      console.error("Revenue fetch error:", err);
+      set({
+        error:
+          err?.response?.data?.message ||
+          err.message ||
+          "Failed to fetch revenue",
+        loading: false,
+      });
     }
   },
 
