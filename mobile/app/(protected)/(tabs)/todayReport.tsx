@@ -5,6 +5,7 @@ import {
   ScrollView,
   FlatList,
   RefreshControl,
+  StyleSheet,
 } from "react-native";
 import React, { useEffect, useState, useCallback } from "react";
 import { ProgressChart } from "react-native-chart-kit";
@@ -45,16 +46,12 @@ const prepareChartData = (dataObject: any) => {
 const ChartSection = ({ title, data }: any) => (
   <Animated.View
     entering={FadeInDown.duration(500)}
-    style={{
-      width: screenWidth,
-      alignItems: "center",
-      paddingVertical: 12,
-    }}
+    style={styles.chartSection}
   >
-    <Text className="text-xl font-bold text-gray-800 mb-4">{title}</Text>
+    <Text style={styles.chartTitle}>{title}</Text>
     <LinearGradient
       colors={["#f0fdf4", "#dcfce7"]}
-      className="rounded-xl p-4 shadow-lg shadow-green-200/50"
+      style={styles.chartContainer}
     >
       <ProgressChart
         data={prepareChartData(data)}
@@ -134,21 +131,16 @@ const TodayReport = () => {
   }, [checkins, checkouts, allData, VehicleTotalMoney, PaymentMethod]);
 
   return (
-    <LinearGradient colors={["#f3f4f6", "#e5e7eb"]} className="flex-1">
-      <Animated.View
-        entering={FadeInDown.duration(300)}
-        className="my-4 mx-4 bg-white rounded-xl justify-center items-center py-5 shadow-md shadow-gray-200/50"
-      >
-        <Text className="text-2xl font-bold text-gray-900">
-          Today&apos;s Report
-        </Text>
+    <LinearGradient colors={["#f3f4f6", "#e5e7eb"]} style={styles.container}>
+      <Animated.View entering={FadeInDown.duration(300)} style={styles.header}>
+        <Text style={styles.headerText}>Today&apos;s Report</Text>
       </Animated.View>
       <ScrollView
         refreshControl={
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
-        <View className="pb-6">
+        <View style={styles.sliderContainer}>
           <ScrollView
             horizontal
             pagingEnabled
@@ -163,102 +155,68 @@ const TodayReport = () => {
 
         <Animated.View
           entering={FadeInDown.duration(500).delay(200)}
-          className="bg-white mx-4 rounded-xl shadow-md shadow-gray-200/50"
+          style={styles.tableContainer}
         >
-          <View className="p-4 flex-1 justify-center items-center">
-            <Text className="text-xl font-bold text-gray-800">Vehicles</Text>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Vehicles</Text>
           </View>
-          <View className="pb-4">
+          <View style={styles.tableWrapper}>
             {Array.isArray(vehicleList) && vehicleList.length > 0 ? (
               <FlatList
                 data={vehicleList}
                 keyExtractor={(item) => item.vehicle}
                 ListHeaderComponent={() => (
-                  <View className="flex-row justify-around bg-green-100 py-3 border-b border-gray-200 mx-2 rounded-t-lg">
-                    <Text className="w-1/5 text-center font-extrabold text-gray-800">
-                      Vehicle
-                    </Text>
-                    <Text className="w-1/5 text-center font-extrabold text-gray-800">
-                      IN
-                    </Text>
-                    <Text className="w-1/5 text-center font-extrabold text-gray-800">
-                      Out
-                    </Text>
-                    <Text className="w-1/5 text-center font-extrabold text-gray-800">
-                      All
-                    </Text>
-                    <Text className="w-1/5 text-center font-extrabold text-gray-800">
-                      Money
-                    </Text>
+                  <View style={styles.tableHeaderRow}>
+                    <Text style={styles.tableHeaderCell}>Vehicle</Text>
+                    <Text style={styles.tableHeaderCell}>IN</Text>
+                    <Text style={styles.tableHeaderCell}>Out</Text>
+                    <Text style={styles.tableHeaderCell}>All</Text>
+                    <Text style={styles.tableHeaderCell}>Money</Text>
                   </View>
                 )}
                 renderItem={({ item, index }) => (
                   <Animated.View
                     entering={FadeInDown.duration(400).delay(index * 100)}
-                    className="flex-row justify-around py-3 border-b border-gray-100 mx-2"
+                    style={styles.tableRow}
                   >
-                    <Text className="w-1/5 text-center text-gray-700 font-medium">
-                      {item.vehicle}
-                    </Text>
-                    <Text className="w-1/5 text-center text-gray-700 font-medium">
-                      {item.checkin}
-                    </Text>
-                    <Text className="w-1/5 text-center text-gray-700 font-medium">
-                      {item.checkout}
-                    </Text>
-                    <Text className="w-1/5 text-center text-gray-700 font-medium">
-                      {item.total}
-                    </Text>
-                    <Text className="w-1/5 text-center text-green-600 font-medium">
-                      ₹{item.money}
-                    </Text>
+                    <Text style={styles.tableCell}>{item.vehicle}</Text>
+                    <Text style={styles.tableCell}>{item.checkin}</Text>
+                    <Text style={styles.tableCell}>{item.checkout}</Text>
+                    <Text style={styles.tableCell}>{item.total}</Text>
+                    <Text style={styles.moneyCell}>₹{item.money}</Text>
                   </Animated.View>
                 )}
               />
             ) : (
-              <Text className="text-center p-4 text-gray-500 font-medium">
-                No vehicle data available
-              </Text>
+              <Text style={styles.emptyText}>No vehicle data available</Text>
             )}
           </View>
           <View>
-            <View className="p-4 flex-1 justify-center items-center">
-              <Text className="text-xl font-bold text-gray-800">
-                Payment Methods
-              </Text>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>Payment Methods</Text>
             </View>
             {Array.isArray(paymentMethod) && paymentMethod.length > 0 ? (
               <FlatList
                 data={paymentMethod}
                 keyExtractor={(item) => item.method}
                 ListHeaderComponent={() => (
-                  <View className="flex-row justify-around bg-green-100 py-3 border-b border-gray-200 mx-2 rounded-t-lg">
-                    <Text className="w-1/2 text-center font-extrabold text-gray-800">
-                      Payment
-                    </Text>
-                    <Text className="w-1/2 text-center font-extrabold text-gray-800">
-                      Money
-                    </Text>
+                  <View style={styles.paymentHeaderRow}>
+                    <Text style={styles.paymentHeaderCell}>Payment</Text>
+                    <Text style={styles.paymentHeaderCell}>Money</Text>
                   </View>
                 )}
                 renderItem={({ item, index }) => (
                   <Animated.View
                     entering={FadeInDown.duration(400).delay(index * 100)}
-                    className="flex-row justify-around py-3 border-b border-gray-100 mx-2"
+                    style={styles.paymentRow}
                   >
-                    <Text className="w-1/2 text-center text-gray-700 font-medium">
-                      {item.method}
-                    </Text>
-                    <Text className="w-1/2 text-center text-green-600 font-medium">
-                      ₹{item.amount}
-                    </Text>
+                    <Text style={styles.paymentCell}>{item.method}</Text>
+                    <Text style={styles.moneyCell}>₹{item.amount}</Text>
                   </Animated.View>
                 )}
               />
             ) : (
-              <Text className="text-center p-4 text-gray-500 font-medium">
-                No payment data
-              </Text>
+              <Text style={styles.emptyText}>No payment data</Text>
             )}
           </View>
         </Animated.View>
@@ -266,5 +224,124 @@ const TodayReport = () => {
     </LinearGradient>
   );
 };
+
+const styles = StyleSheet.create({
+  container: { flex: 1 },
+  header: {
+    marginVertical: 16,
+    marginHorizontal: 16,
+    backgroundColor: "white",
+    borderRadius: 16,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 20,
+    elevation: 4,
+  },
+  headerText: { fontSize: 24, fontWeight: "bold", color: "#111827" },
+  sliderContainer: { paddingBottom: 24 },
+  chartSection: {
+    width: screenWidth,
+    alignItems: "center",
+    paddingVertical: 12,
+  },
+  chartTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    color: "#1f2937",
+    marginBottom: 16,
+  },
+  chartContainer: {
+    borderRadius: 16,
+    padding: 16,
+    elevation: 6,
+    shadowColor: "#bbf7d0",
+    shadowOpacity: 0.5,
+    shadowRadius: 8,
+  },
+  tableContainer: {
+    marginHorizontal: 16,
+    backgroundColor: "white",
+    borderRadius: 16,
+    elevation: 4,
+    paddingBottom: 16,
+  },
+  sectionHeader: { padding: 16, alignItems: "center" },
+  sectionTitle: { fontSize: 20, fontWeight: "bold", color: "#1f2937" },
+  tableWrapper: { paddingBottom: 16 },
+  tableHeaderRow: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    backgroundColor: "#d1fae5",
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderColor: "#e5e7eb",
+    marginHorizontal: 8,
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
+  },
+  tableHeaderCell: {
+    width: "20%",
+    textAlign: "center",
+    fontWeight: "bold",
+    color: "#1f2937",
+  },
+  tableRow: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderColor: "#f3f4f6",
+    marginHorizontal: 8,
+  },
+  tableCell: {
+    width: "20%",
+    textAlign: "center",
+    color: "#374151",
+    fontWeight: "500",
+  },
+  moneyCell: {
+    width: "20%",
+    textAlign: "center",
+    color: "#16a34a",
+    fontWeight: "500",
+  },
+  paymentHeaderRow: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    backgroundColor: "#d1fae5",
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderColor: "#e5e7eb",
+    marginHorizontal: 8,
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
+  },
+  paymentHeaderCell: {
+    width: "50%",
+    textAlign: "center",
+    fontWeight: "bold",
+    color: "#1f2937",
+  },
+  paymentRow: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderColor: "#f3f4f6",
+    marginHorizontal: 8,
+  },
+  paymentCell: {
+    width: "50%",
+    textAlign: "center",
+    color: "#374151",
+    fontWeight: "500",
+  },
+  emptyText: {
+    textAlign: "center",
+    padding: 16,
+    color: "#6b7280",
+    fontWeight: "500",
+  },
+});
 
 export default TodayReport;

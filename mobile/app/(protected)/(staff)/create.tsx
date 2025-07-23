@@ -8,6 +8,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  StyleSheet,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Ionicons from "react-native-vector-icons/Ionicons";
@@ -63,43 +64,38 @@ const CreateStaff = () => {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white">
-      <ScrollView contentContainerStyle={{ paddingBottom: 30 }}>
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : undefined}
-          className="flex-1 px-5 pt-6"
+          style={styles.container}
         >
-          {/* 🔙 Header */}
-          <View className="relative mb-8 items-center justify-center h-12">
+          <View style={styles.headerContainer}>
             <TouchableOpacity
               onPress={() => navigation.goBack()}
-              className="absolute left-0 top-1/2 -translate-y-1/2"
+              style={styles.backButton}
             >
               <Ionicons name="arrow-back" size={28} color="#1F2937" />
             </TouchableOpacity>
-            <Text className="text-2xl font-bold text-gray-800">
-              Create Staff
-            </Text>
+            <Text style={styles.headerText}>Create Staff</Text>
           </View>
 
-          {/* 👤 Username */}
-          <Text className="text-lg text-gray-700 mb-2">Username</Text>
+          <Text style={styles.label}>Username</Text>
           <TextInput
             placeholder="Enter username"
             value={username}
             onChangeText={setUsername}
-            className="border border-blue-100 bg-blue-100 rounded-sm px-4 py-3 text-base mb-4"
+            style={styles.input}
           />
 
-          {/* 🔑 Password */}
-          <Text className="text-lg text-gray-700 mb-2">Password</Text>
-          <View className="flex-row items-center border border-gray-300 px-3 bg-blue-100 rounded-sm mb-4">
+          <Text style={styles.label}>Password</Text>
+          <View style={styles.passwordContainer}>
             <TextInput
               value={password}
               onChangeText={setPassword}
               placeholder="Enter password"
               secureTextEntry={!showPassword}
-              className="flex-1 text-base py-3"
+              style={styles.passwordInput}
             />
             <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
               <Ionicons
@@ -110,42 +106,116 @@ const CreateStaff = () => {
             </TouchableOpacity>
           </View>
 
-          {/* 🏢 Building Name */}
-          <Text className="text-lg text-gray-700 mb-2">Building Name</Text>
+          <Text style={styles.label}>Building Name</Text>
           <TextInput
             placeholder="Enter building name (e.g., Building A)"
             value={buildingName}
             onChangeText={setBuildingName}
-            className="border border-blue-100 bg-blue-100 rounded-sm px-4 py-3 text-base mb-4"
+            style={styles.input}
           />
 
-          {/* 📍 Building Location */}
-          <Text className="text-lg text-gray-700 mb-2">Building Location</Text>
+          <Text style={styles.label}>Building Location</Text>
           <TextInput
             placeholder="Enter building location (e.g., Vellore)"
             value={buildingLocation}
             onChangeText={setBuildingLocation}
-            className="border border-blue-100 bg-blue-100 rounded-sm px-4 py-3 text-base mb-6"
+            style={styles.input}
           />
 
-          {/* ✅ Submit */}
           <TouchableOpacity
             onPress={handleCreateStaff}
             disabled={isLoading}
-            className="bg-green-500 py-3 rounded-sm shadow-md w-full self-center items-center"
+            style={styles.submitButton}
           >
             {isLoading ? (
               <ActivityIndicator color="#fff" />
             ) : (
-              <Text className="text-black text-lg font-bold">Create Staff</Text>
+              <Text style={styles.submitButtonText}>Create Staff</Text>
             )}
           </TouchableOpacity>
         </KeyboardAvoidingView>
       </ScrollView>
-
       <Toast />
     </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: "white",
+  },
+  scrollContent: {
+    paddingBottom: 30,
+  },
+  container: {
+    flex: 1,
+    paddingHorizontal: 20,
+    paddingTop: 24,
+  },
+  headerContainer: {
+    height: 48,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 32,
+    position: "relative",
+  },
+  backButton: {
+    position: "absolute",
+    left: 0,
+    top: "50%",
+    transform: [{ translateY: -14 }],
+  },
+  headerText: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#1F2937",
+  },
+  label: {
+    fontSize: 18,
+    color: "#374151",
+    marginBottom: 8,
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#DBEAFE",
+    backgroundColor: "#DBEAFE",
+    borderRadius: 4,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    fontSize: 16,
+    marginBottom: 16,
+  },
+  passwordContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#D1D5DB",
+    backgroundColor: "#DBEAFE",
+    borderRadius: 4,
+    paddingHorizontal: 12,
+    marginBottom: 16,
+  },
+  passwordInput: {
+    flex: 1,
+    fontSize: 16,
+    paddingVertical: 12,
+  },
+  submitButton: {
+    backgroundColor: "#22C55E",
+    paddingVertical: 12,
+    borderRadius: 4,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  submitButtonText: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#000",
+  },
+});
 
 export default CreateStaff;

@@ -20,7 +20,8 @@
       "permissions": [
         "CAMERA",
         "android.permission.CAMERA",
-        "android.permission.RECORD_AUDIO"
+        "android.permission.RECORD_AUDIO",
+        "INTERNET"
       ],
       "package": "com.gowthamrameshdev.mobile"
     },
@@ -50,8 +51,9 @@
     "extra": {
       "router": {},
       "eas": {
-        "projectId": "f68b43fa-4959-4305-aa8a-76c54f4990db"
+        "projectId": "3d17d88d-73b6-4fd4-9560-61b6847419a2"
       }
-    }
+    },
+    "owner": "goetham"
   }
 }

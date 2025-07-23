@@ -4,6 +4,7 @@ import {
   Text,
   TouchableOpacity,
   SafeAreaView,
+  StyleSheet,
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 
@@ -12,13 +13,11 @@ const StaffDetails = () => {
   const router = useRouter();
 
   return (
-    <SafeAreaView className="flex-1 bg-white px-4 py-6">
-      {/* ✅ Staff Name */}
-      <Text className="text-2xl font-bold mb-8">👤 {username}</Text>
+    <SafeAreaView style={styles.safeArea}>
+      <Text style={styles.staffName}>👤 {username}</Text>
 
-      {/* ✅ Vehicle List Button */}
       <TouchableOpacity
-        className="bg-indigo-600 py-3 px-5 rounded mb-4"
+        style={styles.buttonVehicle}
         onPress={() =>
           router.push({
             pathname: "/(protected)/(tabs)/vehicleList",
@@ -26,12 +25,11 @@ const StaffDetails = () => {
           })
         }
       >
-        <Text className="text-white text-center text-lg">🚗 Vehicle List</Text>
+        <Text style={styles.buttonText}>🚗 Vehicle List</Text>
       </TouchableOpacity>
 
-      {/* ✅ Today Report Button */}
       <TouchableOpacity
-        className="bg-green-600 py-3 px-5 rounded"
+        style={styles.buttonReport}
         onPress={() =>
           router.push({
             pathname: "/(protected)/(tabs)/todayReport",
@@ -39,10 +37,42 @@ const StaffDetails = () => {
           })
         }
       >
-        <Text className="text-white text-center text-lg">📊 Today Report</Text>
+        <Text style={styles.buttonText}>📊 Today Report</Text>
       </TouchableOpacity>
     </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  safeArea: {
+    flex: 1,
+    backgroundColor: "white",
+    paddingHorizontal: 16,
+    paddingVertical: 24,
+  },
+  staffName: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 32,
+  },
+  buttonVehicle: {
+    backgroundColor: "#4F46E5",
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    marginBottom: 16,
+  },
+  buttonReport: {
+    backgroundColor: "#16A34A",
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 18,
+    textAlign: "center",
+  },
+});
 
 export default StaffDetails;

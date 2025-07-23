@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
   SafeAreaView,
   TouchableOpacity,
+  StyleSheet,
 } from "react-native";
 import Toast from "react-native-toast-message";
 import userAuthStore from "@/utils/store";
@@ -36,9 +37,9 @@ const AllStaffs = () => {
 
   const renderItem = ({ item }: any) => (
     <TouchableOpacity
+      style={styles.card}
       onPress={() =>
         router.push({
-          // pathname: "/(protected)/(staff)/staffVehicleList",
           pathname: "/listPage",
           params: {
             staffId: item._id,
@@ -46,11 +47,10 @@ const AllStaffs = () => {
           },
         })
       }
-      className="bg-white p-4 mb-3 rounded-lg shadow"
     >
-      <View className="flex-row justify-between items-center">
-        <Text className="text-lg font-bold">👤 {item.username}</Text>
-        <Text className="text-sm text-gray-600">
+      <View style={styles.cardContent}>
+        <Text style={styles.staffName}>👤 {item.username}</Text>
+        <Text style={styles.buildingInfo}>
           Building: {item.building?.name || "N/A"}{" "}
           {item.building?.location ? `(${item.building.location})` : ""}
         </Text>
@@ -59,23 +59,23 @@ const AllStaffs = () => {
   );
 
   return (
-    <SafeAreaView className="flex-1 bg-gray-100 px-4 mt-6 py-6">
+    <SafeAreaView style={styles.container}>
       {/* Header */}
-      <View className="relative h-12 justify-center items-center mb-6">
+      <View style={styles.header}>
         <TouchableOpacity
           onPress={() => navigation.goBack()}
-          className="absolute left-0 top-1/2 -translate-y-1/2"
+          style={styles.backButton}
         >
           <Ionicons name="arrow-back" size={28} color="#1F2937" />
         </TouchableOpacity>
-        <Text className="text-2xl font-bold text-gray-800">Staff Lists</Text>
+        <Text style={styles.headerTitle}>Staff Lists</Text>
       </View>
 
       {/* Loader / List */}
       {isLoading ? (
         <ActivityIndicator size="large" color="#4F46E5" />
       ) : staffs.length === 0 ? (
-        <Text className="text-center text-gray-500">No staff found</Text>
+        <Text style={styles.emptyText}>No staff found</Text>
       ) : (
         <FlatList
           data={staffs}
@@ -88,5 +88,61 @@ const AllStaffs = () => {
     </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#F3F4F6", // Tailwind gray-100
+    paddingHorizontal: 16,
+    paddingTop: 24,
+  },
+  header: {
+    height: 48,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 24,
+    position: "relative",
+  },
+  backButton: {
+    position: "absolute",
+    left: 0,
+    top: "50%",
+    marginTop: -14, // To vertically center 28px icon
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+    color: "#1F2937", // Tailwind gray-800
+  },
+  card: {
+    backgroundColor: "#FFFFFF",
+    padding: 16,
+    borderRadius: 10,
+    marginBottom: 12,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  cardContent: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  staffName: {
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  buildingInfo: {
+    fontSize: 14,
+    color: "#6B7280", // Tailwind gray-600
+  },
+  emptyText: {
+    textAlign: "center",
+    color: "#6B7280", // Tailwind gray-500
+    fontSize: 16,
+  },
+});
 
 export default AllStaffs;

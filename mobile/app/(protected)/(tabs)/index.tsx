@@ -6,14 +6,23 @@ import {
   View,
   TouchableOpacity,
   ScrollView,
+  LogBox,
+  StyleSheet,
 } from "react-native";
 import CheckIn from "@/components/CheckIn";
 import CheckOut from "@/components/CheckOut";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
+LogBox.ignoreAllLogs(false);
+
+ErrorUtils.setGlobalHandler((error, isFatal) => {
+  console.log("❌ Global Error:", error.message);
+});
+
 const Index = () => {
   const [isCheck, setIsCheck] = useState(true);
   const [user, setUser] = useState({});
+
   useEffect(() => {
     const fetchUser = async () => {
       const userData = await AsyncStorage.getItem("user");
@@ -31,30 +40,28 @@ const Index = () => {
         translucent
         barStyle="dark-content"
       />
-      <View className="bg-[#F3F4F6] py-4 flex-1 px-4">
-        <View className="">
-          <View className="border border-white shadow-md  rounded-sm bg-white p-2">
-            <Text className="text-2xl mb-5 text-[#111827]">
-              hey {user?.username}
-            </Text>
+      <View style={styles.container}>
+        <View>
+          <View style={styles.headerBox}>
+            <Text style={styles.greetingText}>hey {user?.username}</Text>
 
-            <View className="flex-row justify-around ">
+            <View style={styles.toggleContainer}>
               <TouchableOpacity
-                className="bg-green-400 items-center justify-center px-6 py-2 rounded-sm"
+                style={styles.checkInButton}
                 onPress={() => setIsCheck(true)}
               >
-                <Text className="text-2xl text-[#111827]">Check In</Text>
+                <Text style={styles.toggleText}>Check In</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                className="bg-[#EF4444] items-center justify-center px-6 py-2 rounded-sm"
+                style={styles.checkOutButton}
                 onPress={() => setIsCheck(false)}
               >
-                <Text className="text-2xl text-[#111827]">Check Out</Text>
+                <Text style={styles.toggleText}>Check Out</Text>
               </TouchableOpacity>
             </View>
           </View>
         </View>
-        <View className="pt-5 flex-1 h-screen">
+        <View style={styles.contentWrapper}>
           <ScrollView showsVerticalScrollIndicator={false}>
             {isCheck ? <CheckIn /> : <CheckOut />}
           </ScrollView>
@@ -63,5 +70,59 @@ const Index = () => {
     </>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: "#F3F4F6",
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    flex: 1,
+  },
+  headerBox: {
+    borderWidth: 1,
+    borderColor: "white",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
+    borderRadius: 4,
+    backgroundColor: "white",
+    padding: 8,
+  },
+  greetingText: {
+    fontSize: 24,
+    marginBottom: 20,
+    color: "#111827",
+  },
+  toggleContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+  },
+  checkInButton: {
+    backgroundColor: "#4ade80",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 24,
+    paddingVertical: 8,
+    borderRadius: 4,
+  },
+  checkOutButton: {
+    backgroundColor: "#EF4444",
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 24,
+    paddingVertical: 8,
+    borderRadius: 4,
+  },
+  toggleText: {
+    fontSize: 24,
+    color: "#111827",
+  },
+  contentWrapper: {
+    paddingTop: 20,
+    flex: 1,
+  },
+});
 
 export default Index;

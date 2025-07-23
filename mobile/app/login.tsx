@@ -12,6 +12,7 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   ActivityIndicator,
+  StyleSheet,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -54,12 +55,7 @@ const Login = () => {
 
   const LoginForm = () => (
     <ScrollView
-      contentContainerStyle={{
-        flexGrow: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        paddingHorizontal: 20,
-      }}
+      contentContainerStyle={styles.scrollContainer}
       keyboardShouldPersistTaps="handled"
     >
       <Image
@@ -70,40 +66,37 @@ const Login = () => {
         }}
         resizeMode="cover"
       />
-      <View className="items-center gap-1">
-        <Text className="text-4xl mb-3">Parkingz</Text>
+      <View style={styles.titleWrapper}>
+        <Text style={styles.appTitle}>Parkingz</Text>
       </View>
-      <View className="w-full bg-white p-4 pt-5 rounded-2xl gap-8 shadow-md mt-5">
-        <View className="items-center justify-center">
-          <Text className="text-2xl">Login</Text>
+
+      <View style={styles.formWrapper}>
+        <View style={styles.sectionHeader}>
+          <Text style={styles.sectionHeaderText}>Login</Text>
         </View>
 
         {/* Username */}
-        <View className="flex-row items-center border border-gray-300 rounded-xl px-3">
-          <Text className="absolute transform -translate-y-8 text-xl bg-white translate-x-3 font-sans">
-            Username
-          </Text>
+        <View style={styles.inputGroup}>
+          <Text style={styles.floatingLabel}>Username</Text>
           <Ionicons name="person-outline" size={20} color="#6B7280" />
           <TextInput
             placeholder="Username"
             value={userName}
             onChangeText={setUserName}
-            className="flex-1 py-4 px-2 text-lg text-gray-800"
+            style={styles.inputText}
           />
         </View>
 
         {/* Password */}
-        <View className="flex-row items-center border border-gray-300 rounded-xl px-3">
-          <Text className="absolute transform -translate-y-8 text-lg bg-white translate-x-3">
-            Password
-          </Text>
+        <View style={styles.inputGroup}>
+          <Text style={styles.floatingLabel}>Password</Text>
           <Ionicons name="lock-closed-outline" size={20} color="#6B7280" />
           <TextInput
             placeholder="Password"
             value={password}
             onChangeText={setPassword}
             secureTextEntry={!showPassword}
-            className="flex-1 py-4 px-2 text-lg text-gray-800"
+            style={styles.inputText}
           />
           <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
             <Ionicons
@@ -115,25 +108,20 @@ const Login = () => {
         </View>
 
         {/* Signup Link */}
-        <View className="items-center justify-center">
-          <Text className="underline">
+        <View style={styles.linkWrapper}>
+          <Text style={styles.linkText}>
             <Link href="/signUp">Don’t have an Account? signup</Link>
           </Text>
         </View>
 
         {/* Login Button */}
-        <TouchableOpacity
-          className="bg-[#4CAF50] items-center py-4 rounded-xl"
-          onPress={handleLogin}
-        >
+        <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
           {isLoading ? (
-            <View className="bg-white p-2 rounded-full">
+            <View style={styles.loader}>
               <ActivityIndicator size="small" color="#10B981" />
             </View>
           ) : (
-            <Text className="text-center text-xl text-white font-semibold">
-              Login
-            </Text>
+            <Text style={styles.loginButtonText}>Login</Text>
           )}
         </TouchableOpacity>
       </View>
@@ -141,7 +129,7 @@ const Login = () => {
   );
 
   return (
-    <SafeAreaView className="flex-1 bg-green-100">
+    <SafeAreaView style={styles.container}>
       {Platform.OS !== "web" ? (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <KeyboardAvoidingView
@@ -159,5 +147,97 @@ const Login = () => {
     </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#d1fae5", // Tailwind green-100
+  },
+  scrollContainer: {
+    flexGrow: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 20,
+  },
+  titleWrapper: {
+    alignItems: "center",
+    gap: 4,
+  },
+  appTitle: {
+    fontSize: 32,
+    marginBottom: 12,
+  },
+  formWrapper: {
+    width: "100%",
+    backgroundColor: "#fff",
+    padding: 16,
+    paddingTop: 20,
+    borderRadius: 16,
+    marginTop: 20,
+    gap: 24,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
+  },
+  sectionHeader: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  sectionHeaderText: {
+    fontSize: 24,
+  },
+  inputGroup: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#d1d5db", // Tailwind gray-300
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    position: "relative",
+    backgroundColor: "#fff",
+  },
+  floatingLabel: {
+    position: "absolute",
+    top: -14,
+    left: 12,
+    fontSize: 16,
+    backgroundColor: "#fff",
+    zIndex: 10,
+    color: "#374151", // Tailwind gray-700
+  },
+  inputText: {
+    flex: 1,
+    paddingVertical: 14,
+    paddingHorizontal: 8,
+    fontSize: 16,
+    color: "#1F2937", // Tailwind gray-800
+  },
+  linkWrapper: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  linkText: {
+    textDecorationLine: "underline",
+  },
+  loginButton: {
+    backgroundColor: "#4CAF50",
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  loginButtonText: {
+    fontSize: 20,
+    color: "#fff",
+    fontWeight: "600",
+  },
+  loader: {
+    backgroundColor: "#fff",
+    padding: 8,
+    borderRadius: 50,
+  },
+});
 
 export default Login;

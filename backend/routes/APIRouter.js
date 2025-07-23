@@ -141,7 +141,10 @@ router.put(
   userController.updateMonthlyPrices
 );
 router.get("/api/getPrices/:adminId", verifyToken, userController.getPrices);
-
+// Ping route for uptime check
+router.get("/api/ping", (req, res) => {
+  res.send("Server is alive! 🚗");
+});
 router.post(
   "/api/createMonthlyPass",
   verifyToken,

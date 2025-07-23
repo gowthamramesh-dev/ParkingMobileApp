@@ -4,13 +4,13 @@ import {
   TextInput,
   TouchableOpacity,
   Text,
-  // Dimensions,
   KeyboardAvoidingView,
   ScrollView,
   Platform,
   TouchableWithoutFeedback,
   Keyboard,
   ActivityIndicator,
+  StyleSheet,
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -32,6 +32,7 @@ const Signup = () => {
     setIsLoading(true);
     const result = await signup(userName, email, password);
     setIsLoading(false);
+
     if (!result.success) {
       Toast.show({
         type: "error",
@@ -50,11 +51,12 @@ const Signup = () => {
         autoHide: true,
       });
     }
+
     return <Redirect href={"/login"} />;
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-green-100">
+    <SafeAreaView style={styles.container}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <KeyboardAvoidingView
           behavior={Platform.OS === "ios" ? "padding" : "height"}
@@ -62,42 +64,34 @@ const Signup = () => {
           keyboardVerticalOffset={Platform.OS === "ios" ? 60 : 0}
         >
           <ScrollView
-            contentContainerStyle={{
-              flexGrow: 1,
-              justifyContent: "center",
-              alignItems: "center",
-              paddingHorizontal: 20,
-            }}
+            contentContainerStyle={styles.scrollContent}
             keyboardShouldPersistTaps="handled"
           >
-            <View className="mb-5 items-center gap-1 ">
-              <Text className="text-4xl mb-3">Parkingz</Text>
-              <Text className="text-2xl">Let&apos;s get Started.</Text>
+            <View style={styles.headingContainer}>
+              <Text style={styles.appName}>Parkingz</Text>
+              <Text style={styles.tagline}>Let's get Started.</Text>
             </View>
-            <View className="w-full bg-white p-4 pt-5 rounded-2xl gap-8 shadow-md">
-              <View className="items-center justify-center">
-                <Text className="text-2xl">SignUp</Text>
+
+            <View style={styles.formWrapper}>
+              <View style={styles.sectionHeader}>
+                <Text style={styles.sectionHeaderText}>SignUp</Text>
               </View>
 
               {/* Username */}
-              <View className="flex-row items-center border border-gray-300 rounded-xl px-3">
-                <Text className="absolute transform -translate-y-8 text-xl bg-white translate-x-3 font-sans z-10 pointer-events-none">
-                  Username
-                </Text>
+              <View style={styles.inputGroup}>
+                <Text style={styles.floatingLabel}>Username</Text>
                 <Ionicons name="person-outline" size={20} color="#6B7280" />
                 <TextInput
                   placeholder="Username"
                   value={userName}
                   onChangeText={setUserName}
-                  className="flex-1 py-4 px-2 text-lg text-gray-800"
+                  style={styles.inputText}
                 />
               </View>
 
               {/* Email */}
-              <View className="flex-row items-center border border-gray-300 rounded-xl px-3">
-                <Text className="absolute transform -translate-y-8 text-xl bg-white translate-x-3 font-sans">
-                  Email
-                </Text>
+              <View style={styles.inputGroup}>
+                <Text style={styles.floatingLabel}>Email</Text>
                 <Ionicons name="mail-outline" size={20} color="#6B7280" />
                 <TextInput
                   placeholder="Email"
@@ -105,15 +99,13 @@ const Signup = () => {
                   onChangeText={setEmail}
                   keyboardType="email-address"
                   autoCapitalize="none"
-                  className="flex-1 py-4 px-2 text-lg text-gray-800"
+                  style={styles.inputText}
                 />
               </View>
 
               {/* Password */}
-              <View className="flex-row items-center border border-gray-300 rounded-xl px-3">
-                <Text className="absolute transform -translate-y-8 text-lg bg-white translate-x-3">
-                  Password
-                </Text>
+              <View style={styles.inputGroup}>
+                <Text style={styles.floatingLabel}>Password</Text>
                 <Ionicons
                   name="lock-closed-outline"
                   size={20}
@@ -124,7 +116,7 @@ const Signup = () => {
                   value={password}
                   onChangeText={setPassword}
                   secureTextEntry={!showPassword}
-                  className="flex-1 py-4 px-2 text-lg text-gray-800"
+                  style={styles.inputText}
                 />
                 <TouchableOpacity
                   onPress={() => setShowPassword(!showPassword)}
@@ -138,10 +130,8 @@ const Signup = () => {
               </View>
 
               {/* Confirm Password */}
-              <View className="flex-row items-center border border-gray-300 rounded-xl px-3">
-                <Text className="absolute transform -translate-y-8 text-lg bg-white translate-x-3">
-                  Confirm Password
-                </Text>
+              <View style={styles.inputGroup}>
+                <Text style={styles.floatingLabel}>Confirm Password</Text>
                 <Ionicons
                   name="lock-closed-outline"
                   size={20}
@@ -152,28 +142,25 @@ const Signup = () => {
                   value={confirmPassword}
                   onChangeText={setConfirmPassword}
                   secureTextEntry={!showPassword}
-                  className="flex-1 py-4 px-2 text-lg text-gray-800"
+                  style={styles.inputText}
                 />
               </View>
-              <View className="items-center justify-center">
-                <Text className="underline">
-                  <Link href={"/login"}>Already have an Account? Login</Link>
+
+              {/* Link to Login */}
+              <View style={styles.loginLinkWrapper}>
+                <Text style={styles.loginLinkText}>
+                  <Link href="/login">Already have an Account? Login</Link>
                 </Text>
               </View>
 
               {/* Signup Button */}
-              <TouchableOpacity
-                className="bg-[#4CAF50] py-4 rounded-xl"
-                onPress={handleSignup}
-              >
+              <TouchableOpacity style={styles.signupBtn} onPress={handleSignup}>
                 {isLoading ? (
-                  <View className="bg-white p-2 rounded-full">
+                  <View style={styles.loader}>
                     <ActivityIndicator size="small" color="#10B981" />
                   </View>
                 ) : (
-                  <Text className="text-center text-xl text-white font-semibold">
-                    SignUp
-                  </Text>
+                  <Text style={styles.signupText}>SignUp</Text>
                 )}
               </TouchableOpacity>
             </View>
@@ -184,5 +171,99 @@ const Signup = () => {
     </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#d1fae5", // Tailwind's green-100
+  },
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 20,
+  },
+  headingContainer: {
+    marginBottom: 20,
+    alignItems: "center",
+  },
+  appName: {
+    fontSize: 32,
+    marginBottom: 12,
+  },
+  tagline: {
+    fontSize: 24,
+  },
+  formWrapper: {
+    width: "100%",
+    backgroundColor: "#fff",
+    padding: 16,
+    paddingTop: 20,
+    borderRadius: 16,
+    gap: 24,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
+  },
+  sectionHeader: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  sectionHeaderText: {
+    fontSize: 24,
+  },
+  inputGroup: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#d1d5db", // Tailwind's gray-300
+    borderRadius: 12,
+    paddingHorizontal: 12,
+    position: "relative",
+    backgroundColor: "#fff",
+  },
+  floatingLabel: {
+    position: "absolute",
+    top: -14,
+    left: 12,
+    fontSize: 16,
+    backgroundColor: "#fff",
+    zIndex: 10,
+    color: "#374151", // Tailwind gray-800
+  },
+  inputText: {
+    flex: 1,
+    paddingVertical: 14,
+    paddingHorizontal: 8,
+    fontSize: 16,
+    color: "#1F2937", // Tailwind gray-800
+  },
+  loginLinkWrapper: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  loginLinkText: {
+    textDecorationLine: "underline",
+  },
+  signupBtn: {
+    backgroundColor: "#4CAF50",
+    paddingVertical: 16,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  signupText: {
+    fontSize: 20,
+    color: "#fff",
+    fontWeight: "600",
+  },
+  loader: {
+    backgroundColor: "#fff",
+    padding: 8,
+    borderRadius: 50,
+  },
+});
 
 export default Signup;
